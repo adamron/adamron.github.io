@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Adam's personal tools and utilities">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Adam's Tools</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #eee;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tile {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .tile:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .tile-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .tile-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .tile-desc {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .tiles {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Adam's Tools</h1>
+      <p class="subtitle">Simple utilities and experiments</p>
+    </header>
+
+    <nav class="tiles">
+      <a href="tools/calculator.html" class="tile">
+        <div class="tile-icon">🧮</div>
+        <div class="tile-title">Calculator</div>
+        <div class="tile-desc">Quick calculations</div>
+      </a>
+
+      <a href="tools/notes.html" class="tile">
+        <div class="tile-icon">📝</div>
+        <div class="tile-title">Notes</div>
+        <div class="tile-desc">Scratch pad for ideas</div>
+      </a>
+
+      <a href="tools/timer.html" class="tile">
+        <div class="tile-icon">⏱️</div>
+        <div class="tile-title">Timer</div>
+        <div class="tile-desc">Countdown and stopwatch</div>
+      </a>
+
+      <a href="tools/converter.html" class="tile">
+        <div class="tile-icon">🔄</div>
+        <div class="tile-title">Converter</div>
+        <div class="tile-desc">Unit conversions</div>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
