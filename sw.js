@@ -1,8 +1,9 @@
-const CACHE_NAME = 'tools-v1';
+const CACHE_NAME = 'tools-v2';
 const ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/tools/animal-explorer/index.html'
 ];
 
 self.addEventListener('install', event => {

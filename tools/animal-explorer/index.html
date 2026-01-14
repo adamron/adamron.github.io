@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Animal Explorer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #eee;
+      overflow-x: hidden;
+    }
+
+    /* Gallery View */
+    .gallery {
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .gallery-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .back-link {
+      color: #888;
+      text-decoration: none;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .back-link:hover {
+      color: #eee;
+    }
+
+    .gallery h1 {
+      font-size: 1.8rem;
+      font-weight: 300;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .animal-tile {
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .animal-tile:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .animal-tile img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .animal-tile .name {
+      padding: 0.75rem;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Detail View */
+    .detail {
+      position: fixed;
+      inset: 0;
+      background: #0a0a14;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .detail.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+    }
+
+    .detail-title {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #eee;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    .detail-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 1rem;
+    }
+
+    .detail-content img {
+      width: 400px;
+      height: 400px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 12px;
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .detail-content img.dragging {
+      transition: none;
+    }
+
+    @media (min-width: 600px) {
+      .detail-content img {
+        width: 500px;
+        height: 500px;
+      }
+    }
+
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #eee;
+      font-size: 2rem;
+      padding: 1rem 0.75rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      z-index: 5;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-btn.prev {
+      left: 0;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .nav-btn.next {
+      right: 0;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .counter {
+      text-align: center;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .detail-info {
+      padding: 1rem 1.5rem 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .tag-label {
+      color: #888;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    .tag-value {
+      color: #eee;
+    }
+
+    .tag[data-category="biome"] { background: rgba(34, 139, 34, 0.3); }
+    .tag[data-category="geography"] { background: rgba(70, 130, 180, 0.3); }
+    .tag[data-category="order"] { background: rgba(138, 43, 226, 0.3); }
+    .tag[data-category="diet"] { background: rgba(255, 140, 0, 0.3); }
+    .tag[data-category="conservation"] { background: rgba(220, 20, 60, 0.3); }
+
+    @media (max-width: 600px) {
+      .gallery {
+        padding: 1rem;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .nav-btn {
+        padding: 0.75rem 0.5rem;
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery" id="gallery">
+    <div class="gallery-header">
+      <a href="../../index.html" class="back-link">&larr;</a>
+      <h1>Animal Explorer</h1>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="detail" id="detail">
+    <div class="detail-header">
+      <span class="detail-title" id="detail-title"></span>
+      <button class="close-btn" id="close-btn">&times;</button>
+    </div>
+    <div class="detail-content">
+      <button class="nav-btn prev" id="prev-btn">&lsaquo;</button>
+      <img id="detail-img" src="" alt="">
+      <button class="nav-btn next" id="next-btn">&rsaquo;</button>
+    </div>
+    <div class="detail-info">
+      <div class="tags" id="tags"></div>
+      <div class="counter" id="counter"></div>
+    </div>
+  </div>
+
+  <script>
+    const animals = [
+      {
+        name: 'Lion',
+        image: 'images/lion.jpg',
+        tags: {
+          biome: 'Savanna',
+          geography: 'Africa',
+          order: 'Carnivora',
+          diet: 'Carnivore',
+          conservation: 'Vulnerable'
+        }
+      },
+      {
+        name: 'Elephant',
+        image: 'images/elephant.jpg',
+        tags: {
+          biome: 'Savanna',
+          geography: 'Africa & Asia',
+          order: 'Proboscidea',
+          diet: 'Herbivore',
+          conservation: 'Endangered'
+        }
+      },
+      {
+        name: 'Penguin',
+        image: 'images/penguin.jpg',
+        tags: {
+          biome: 'Antarctic',
+          geography: 'Antarctica',
+          order: 'Sphenisciformes',
+          diet: 'Carnivore',
+          conservation: 'Near Threatened'
+        }
+      },
+      {
+        name: 'Fox',
+        image: 'images/fox.jpg',
+        tags: {
+          biome: 'Forest',
+          geography: 'Northern Hemisphere',
+          order: 'Carnivora',
+          diet: 'Omnivore',
+          conservation: 'Least Concern'
+        }
+      },
+      {
+        name: 'Owl',
+        image: 'images/owl.jpg',
+        tags: {
+          biome: 'Forest',
+          geography: 'Worldwide',
+          order: 'Strigiformes',
+          diet: 'Carnivore',
+          conservation: 'Least Concern'
+        }
+      }
+    ];
+
+    let currentIndex = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const grid = document.getElementById('grid');
+    const detail = document.getElementById('detail');
+    const detailImg = document.getElementById('detail-img');
+    const detailTitle = document.getElementById('detail-title');
+    const tagsContainer = document.getElementById('tags');
+    const counter = document.getElementById('counter');
+    const closeBtn = document.getElementById('close-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // Build gallery
+    animals.forEach((animal, index) => {
+      const tile = document.createElement('div');
+      tile.className = 'animal-tile';
+      tile.innerHTML = `
+        <img src="${animal.image}" alt="${animal.name}">
+        <div class="name">${animal.name}</div>
+      `;
+      tile.addEventListener('click', () => openDetail(index));
+      grid.appendChild(tile);
+    });
+
+    function openDetail(index) {
+      currentIndex = index;
+      updateDetail();
+      detail.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      detail.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function updateDetail() {
+      const animal = animals[currentIndex];
+      detailImg.src = animal.image;
+      detailImg.alt = animal.name;
+      detailTitle.textContent = animal.name;
+      counter.textContent = `${currentIndex + 1} / ${animals.length}`;
+
+      // Render tags
+      tagsContainer.innerHTML = Object.entries(animal.tags)
+        .map(([key, value]) => `
+          <span class="tag" data-category="${key}">
+            <span class="tag-label">${key}</span>
+            <span class="tag-value">${value}</span>
+          </span>
+        `).join('');
+    }
+
+    function navigate(direction) {
+      currentIndex = (currentIndex + direction + animals.length) % animals.length;
+      updateDetail();
+    }
+
+    // Event listeners
+    closeBtn.addEventListener('click', closeDetail);
+    prevBtn.addEventListener('click', () => navigate(-1));
+    nextBtn.addEventListener('click', () => navigate(1));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (!detail.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft') navigate(-1);
+      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'Escape') closeDetail();
+    });
+
+    // Touch swipe
+    detail.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    detail.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const threshold = 50;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > threshold) {
+        navigate(diff > 0 ? 1 : -1);
+      }
+    }
+
+    // Mouse wheel scroll
+    let wheelTimeout = null;
+    detail.addEventListener('wheel', (e) => {
+      if (!detail.classList.contains('active')) return;
+      e.preventDefault();
+      if (wheelTimeout) return;
+
+      wheelTimeout = setTimeout(() => {
+        wheelTimeout = null;
+      }, 300);
+
+      if (e.deltaY > 0 || e.deltaX > 0) {
+        navigate(1);
+      } else {
+        navigate(-1);
+      }
+    }, { passive: false });
+
+  </script>
+</body>
+</html>
