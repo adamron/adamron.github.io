@@ -336,8 +336,6 @@
     ];
 
     let currentIndex = 0;
-    let touchStartX = 0;
-    let touchEndX = 0;
 
     const grid = document.getElementById('grid');
     const detail = document.getElementById('detail');
@@ -408,23 +406,91 @@
       if (e.key === 'Escape') closeDetail();
     });
 
-    // Touch swipe
-    detail.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
+    // Touch/mouse drag swipe
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragCurrentX = 0;
 
-    detail.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, { passive: true });
+    function startDrag(x) {
+      isDragging = true;
+      dragStartX = x;
+      dragCurrentX = x;
+      detailImg.classList.add('dragging');
+    }
 
-    function handleSwipe() {
-      const threshold = 50;
-      const diff = touchStartX - touchEndX;
+    function moveDrag(x) {
+      if (!isDragging) return;
+      dragCurrentX = x;
+      const diff = dragCurrentX - dragStartX;
+      const opacity = 1 - Math.min(Math.abs(diff) / 300, 0.5);
+      detailImg.style.transform = `translateX(${diff}px)`;
+      detailImg.style.opacity = opacity;
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      detailImg.classList.remove('dragging');
+
+      const diff = dragCurrentX - dragStartX;
+      const threshold = 80;
+
       if (Math.abs(diff) > threshold) {
-        navigate(diff > 0 ? 1 : -1);
+        // Animate out, then switch
+        const direction = diff > 0 ? -1 : 1;
+        const exitX = diff > 0 ? '100%' : '-100%';
+        detailImg.style.transform = `translateX(${exitX})`;
+        detailImg.style.opacity = '0';
+
+        setTimeout(() => {
+          detailImg.style.transition = 'none';
+          detailImg.style.transform = `translateX(${diff > 0 ? '-100%' : '100%'})`;
+          navigate(direction);
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              detailImg.style.transition = '';
+              detailImg.style.transform = 'translateX(0)';
+              detailImg.style.opacity = '1';
+            });
+          });
+        }, 200);
+      } else {
+        // Snap back
+        detailImg.style.transform = 'translateX(0)';
+        detailImg.style.opacity = '1';
       }
     }
+
+    // Touch events
+    detail.addEventListener('touchstart', (e) => {
+      if (e.target.closest('.nav-btn, .close-btn, .tag')) return;
+      startDrag(e.touches[0].clientX);
+    }, { passive: true });
+
+    detail.addEventListener('touchmove', (e) => {
+      moveDrag(e.touches[0].clientX);
+    }, { passive: true });
+
+    detail.addEventListener('touchend', endDrag);
+    detail.addEventListener('touchcancel', endDrag);
+
+    // Mouse events for desktop drag
+    detail.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.nav-btn, .close-btn, .tag')) return;
+      if (!detail.classList.contains('active')) return;
+      e.preventDefault();
+      startDrag(e.clientX);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        moveDrag(e.clientX);
+      }
+    });
+
+    document.addEventListener('mouseup', endDrag);
 
     // Mouse wheel scroll
     let wheelTimeout = null;
