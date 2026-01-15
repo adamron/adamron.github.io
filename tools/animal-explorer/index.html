@@ -50,6 +50,124 @@
       font-weight: 300;
     }
 
+    /* Filters */
+    .filters {
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .filters-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: none;
+      border: none;
+      color: #eee;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .filters-toggle:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .filters-toggle-icon {
+      transition: transform 0.2s;
+    }
+
+    .filters.open .filters-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .filters-content {
+      display: none;
+      padding: 0 1rem 1rem;
+    }
+
+    .filters.open .filters-content {
+      display: block;
+    }
+
+    .filter-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .filter-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .filter-group-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .filter-option {
+      padding: 0.3rem 0.6rem;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ccc;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-option:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .filter-option.active {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #fff;
+    }
+
+    .filter-option[data-category="biome"].active { background: rgba(34, 139, 34, 0.4); border-color: rgba(34, 139, 34, 0.6); }
+    .filter-option[data-category="geography"].active { background: rgba(70, 130, 180, 0.4); border-color: rgba(70, 130, 180, 0.6); }
+    .filter-option[data-category="class"].active { background: rgba(138, 43, 226, 0.4); border-color: rgba(138, 43, 226, 0.6); }
+    .filter-option[data-category="diet"].active { background: rgba(255, 140, 0, 0.4); border-color: rgba(255, 140, 0, 0.6); }
+    .filter-option[data-category="conservation"].active { background: rgba(220, 20, 60, 0.4); border-color: rgba(220, 20, 60, 0.6); }
+
+    .filters-active-count {
+      font-size: 0.75rem;
+      color: #888;
+      margin-left: 0.5rem;
+    }
+
+    .clear-filters {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      margin-left: auto;
+    }
+
+    .clear-filters:hover {
+      color: #fff;
+    }
+
+    .animal-tile.hidden {
+      display: none;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -101,17 +219,20 @@
     }
 
     .detail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: absolute;
+      top: 0;
+      right: 0;
       padding: 1rem 1.5rem;
-      background: rgba(0, 0, 0, 0.5);
-      flex-shrink: 0;
+      z-index: 10;
     }
 
     .detail-title {
-      font-size: 1.2rem;
-      font-weight: 500;
+      font-size: 2.5rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 0.5rem 1rem;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
     }
 
     .close-btn {
@@ -139,8 +260,8 @@
     }
 
     .detail-content img {
-      width: 400px;
-      height: 400px;
+      width: min(66vw, 66vh);
+      height: min(66vw, 66vh);
       object-fit: cover;
       object-position: center;
       border-radius: 12px;
@@ -151,13 +272,6 @@
 
     .detail-content img.dragging {
       transition: none;
-    }
-
-    @media (min-width: 600px) {
-      .detail-content img {
-        width: 500px;
-        height: 500px;
-      }
     }
 
     .nav-btn {
@@ -196,7 +310,7 @@
     }
 
     .detail-info {
-      padding: 1rem 1.5rem 1.5rem;
+      padding: 0.75rem 1.5rem 1.5rem;
       background: rgba(0, 0, 0, 0.3);
       flex-shrink: 0;
     }
@@ -257,12 +371,18 @@
       <a href="../../index.html" class="back-link">&larr;</a>
       <h1>Animal Explorer</h1>
     </div>
+    <div class="filters" id="filters">
+      <button class="filters-toggle" id="filters-toggle">
+        <span>Filters <span class="filters-active-count" id="filters-count"></span></span>
+        <span class="filters-toggle-icon">&#9662;</span>
+      </button>
+      <div class="filters-content" id="filters-content"></div>
+    </div>
     <div class="grid" id="grid"></div>
   </div>
 
   <div class="detail" id="detail">
     <div class="detail-header">
-      <span class="detail-title" id="detail-title"></span>
       <button class="close-btn" id="close-btn">&times;</button>
     </div>
     <div class="detail-content">
@@ -270,72 +390,18 @@
       <img id="detail-img" src="" alt="">
       <button class="nav-btn next" id="next-btn">&rsaquo;</button>
     </div>
+    <div class="detail-title" id="detail-title"></div>
     <div class="detail-info">
       <div class="tags" id="tags"></div>
       <div class="counter" id="counter"></div>
     </div>
   </div>
 
+  <script src="animals.js"></script>
   <script>
-    const animals = [
-      {
-        name: 'Lion',
-        image: 'images/lion.jpg',
-        tags: {
-          biome: 'Savanna',
-          geography: 'Africa',
-          class: 'Mammal',
-          diet: 'Carnivore',
-          conservation: 'Vulnerable'
-        }
-      },
-      {
-        name: 'Elephant',
-        image: 'images/elephant.jpg',
-        tags: {
-          biome: 'Savanna',
-          geography: 'Africa & Asia',
-          class: 'Mammal',
-          diet: 'Herbivore',
-          conservation: 'Endangered'
-        }
-      },
-      {
-        name: 'Penguin',
-        image: 'images/penguin.jpg',
-        tags: {
-          biome: 'Antarctic',
-          geography: 'Antarctica',
-          class: 'Bird',
-          diet: 'Carnivore',
-          conservation: 'Near Threatened'
-        }
-      },
-      {
-        name: 'Fox',
-        image: 'images/fox.jpg',
-        tags: {
-          biome: 'Forest',
-          geography: 'Northern Hemisphere',
-          class: 'Mammal',
-          diet: 'Omnivore',
-          conservation: 'Least Concern'
-        }
-      },
-      {
-        name: 'Owl',
-        image: 'images/owl.jpg',
-        tags: {
-          biome: 'Forest',
-          geography: 'Worldwide',
-          class: 'Bird',
-          diet: 'Carnivore',
-          conservation: 'Least Concern'
-        }
-      }
-    ];
-
     let currentIndex = 0;
+    let filteredIndices = animals.map((_, i) => i); // All animals initially
+    const activeFilters = {}; // { category: Set of values }
 
     const grid = document.getElementById('grid');
     const detail = document.getElementById('detail');
@@ -346,6 +412,91 @@
     const closeBtn = document.getElementById('close-btn');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
+    const filtersEl = document.getElementById('filters');
+    const filtersToggle = document.getElementById('filters-toggle');
+    const filtersContent = document.getElementById('filters-content');
+    const filtersCount = document.getElementById('filters-count');
+
+    // Build filter options from animal data
+    const tagCategories = ['class', 'biome', 'diet', 'geography', 'conservation'];
+    const tagValues = {};
+    tagCategories.forEach(cat => {
+      tagValues[cat] = new Set();
+      animals.forEach(a => {
+        if (a.tags[cat]) tagValues[cat].add(a.tags[cat]);
+      });
+    });
+
+    // Render filter UI
+    tagCategories.forEach(cat => {
+      const values = Array.from(tagValues[cat]).sort();
+      if (values.length === 0) return;
+
+      const group = document.createElement('div');
+      group.className = 'filter-group';
+      group.innerHTML = `
+        <span class="filter-group-label">${cat}</span>
+        <div class="filter-options">
+          ${values.map(v => `<button class="filter-option" data-category="${cat}" data-value="${v}">${v}</button>`).join('')}
+        </div>
+      `;
+      filtersContent.appendChild(group);
+    });
+
+    // Filter toggle
+    filtersToggle.addEventListener('click', () => {
+      filtersEl.classList.toggle('open');
+    });
+
+    // Filter option click handler
+    filtersContent.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-option');
+      if (!btn) return;
+
+      const cat = btn.dataset.category;
+      const val = btn.dataset.value;
+
+      if (!activeFilters[cat]) activeFilters[cat] = new Set();
+
+      if (activeFilters[cat].has(val)) {
+        activeFilters[cat].delete(val);
+        btn.classList.remove('active');
+      } else {
+        activeFilters[cat].add(val);
+        btn.classList.add('active');
+      }
+
+      applyFilters();
+    });
+
+    function applyFilters() {
+      // Count active filters
+      let totalActive = 0;
+      Object.values(activeFilters).forEach(s => totalActive += s.size);
+      filtersCount.textContent = totalActive > 0 ? `(${totalActive})` : '';
+
+      // Filter animals
+      filteredIndices = [];
+      animals.forEach((animal, index) => {
+        let matches = true;
+        for (const cat in activeFilters) {
+          if (activeFilters[cat].size > 0) {
+            if (!activeFilters[cat].has(animal.tags[cat])) {
+              matches = false;
+              break;
+            }
+          }
+        }
+
+        const tile = grid.children[index];
+        if (matches) {
+          filteredIndices.push(index);
+          tile.classList.remove('hidden');
+        } else {
+          tile.classList.add('hidden');
+        }
+      });
+    }
 
     // Build gallery
     animals.forEach((animal, index) => {
@@ -376,7 +527,10 @@
       detailImg.src = animal.image;
       detailImg.alt = animal.name;
       detailTitle.textContent = animal.name;
-      counter.textContent = `${currentIndex + 1} / ${animals.length}`;
+
+      // Counter shows position in filtered list
+      const filteredPos = filteredIndices.indexOf(currentIndex) + 1;
+      counter.textContent = `${filteredPos} / ${filteredIndices.length}`;
 
       // Render tags
       tagsContainer.innerHTML = Object.entries(animal.tags)
@@ -389,7 +543,16 @@
     }
 
     function navigate(direction) {
-      currentIndex = (currentIndex + direction + animals.length) % animals.length;
+      if (filteredIndices.length === 0) return;
+
+      const currentFilteredPos = filteredIndices.indexOf(currentIndex);
+      let newFilteredPos = currentFilteredPos + direction;
+
+      // Wrap around
+      if (newFilteredPos < 0) newFilteredPos = filteredIndices.length - 1;
+      if (newFilteredPos >= filteredIndices.length) newFilteredPos = 0;
+
+      currentIndex = filteredIndices[newFilteredPos];
       updateDetail();
     }
 
