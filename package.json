@@ -1,0 +1,23 @@
+{
+  "name": "personal-site",
+  "version": "1.0.0",
+  "description": "",
+  "main": "audit-images.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamron/adamron.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adamron/adamron.github.io/issues"
+  },
+  "homepage": "https://github.com/adamron/adamron.github.io#readme",
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}

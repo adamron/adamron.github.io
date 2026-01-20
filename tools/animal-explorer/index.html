@@ -195,6 +195,15 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
+    .animal-tile img[data-src] {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .animal-tile img.loaded {
+      opacity: 1;
+    }
+
     .animal-tile .name {
       padding: 0.75rem;
       text-align: center;
@@ -417,8 +426,21 @@
     const filtersContent = document.getElementById('filters-content');
     const filtersCount = document.getElementById('filters-count');
 
-    // Build filter options from animal data
+    // Tag categories for filters and detail view
     const tagCategories = ['class', 'biome', 'diet', 'geography', 'conservation'];
+
+    // Pre-create tag elements for detail view (avoids innerHTML rebuilds)
+    const tagElements = {};
+    tagCategories.forEach(cat => {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.dataset.category = cat;
+      tag.innerHTML = `<span class="tag-label">${cat}</span><span class="tag-value"></span>`;
+      tagsContainer.appendChild(tag);
+      tagElements[cat] = tag.querySelector('.tag-value');
+    });
+
+    // Build filter options from animal data
     const tagValues = {};
     tagCategories.forEach(cat => {
       tagValues[cat] = new Set();
@@ -475,9 +497,12 @@
       Object.values(activeFilters).forEach(s => totalActive += s.size);
       filtersCount.textContent = totalActive > 0 ? `(${totalActive})` : '';
 
-      // Filter animals
-      filteredIndices = [];
+      // Filter animals (reuse array to avoid allocation)
+      filteredIndices.length = 0;
       animals.forEach((animal, index) => {
+        // Skip animals without valid images
+        if (!validImageIndices.has(index)) return;
+
         let matches = true;
         for (const cat in activeFilters) {
           if (activeFilters[cat].size > 0) {
@@ -498,17 +523,66 @@
       });
     }
 
-    // Build gallery
+    // Helper to get thumbnail path from image path
+    function getThumbnail(imagePath) {
+      return imagePath.replace('images/', 'images/thumbs/');
+    }
+
+    // Build gallery with lazy loading
     animals.forEach((animal, index) => {
       const tile = document.createElement('div');
       tile.className = 'animal-tile';
+      tile.dataset.index = index;
+
+      // Hide animals without an image path
+      if (!animal.image) {
+        validImageIndices.delete(index);
+        tile.style.display = 'none';
+      }
+
       tile.innerHTML = `
-        <img src="${animal.image}" alt="${animal.name}">
+        <img data-src="${getThumbnail(animal.image || '')}" alt="${animal.name}">
         <div class="name">${animal.name}</div>
       `;
-      tile.addEventListener('click', () => openDetail(index));
       grid.appendChild(tile);
     });
+
+    // Event delegation for tile clicks
+    grid.addEventListener('click', (e) => {
+      const tile = e.target.closest('.animal-tile');
+      if (tile && tile.dataset.index !== undefined) {
+        openDetail(parseInt(tile.dataset.index, 10));
+      }
+    });
+
+    // Track animals with valid images
+    const validImageIndices = new Set(animals.map((_, i) => i));
+
+    // Lazy load images with IntersectionObserver
+    const lazyImages = grid.querySelectorAll('img[data-src]');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.onload = () => img.classList.add('loaded');
+          img.onerror = () => {
+            const tile = img.closest('.animal-tile');
+            const index = parseInt(tile.dataset.index, 10);
+            validImageIndices.delete(index);
+            tile.style.display = 'none';
+            // Update filtered indices to exclude this animal
+            applyFilters();
+          };
+          img.removeAttribute('data-src');
+          observer.unobserve(img);
+        }
+      });
+    }, {
+      rootMargin: '100px'
+    });
+
+    lazyImages.forEach(img => imageObserver.observe(img));
 
     function openDetail(index) {
       currentIndex = index;
@@ -532,14 +606,10 @@
       const filteredPos = filteredIndices.indexOf(currentIndex) + 1;
       counter.textContent = `${filteredPos} / ${filteredIndices.length}`;
 
-      // Render tags
-      tagsContainer.innerHTML = Object.entries(animal.tags)
-        .map(([key, value]) => `
-          <span class="tag" data-category="${key}">
-            <span class="tag-label">${key}</span>
-            <span class="tag-value">${value}</span>
-          </span>
-        `).join('');
+      // Update pre-created tag elements (avoids innerHTML rebuilds)
+      tagCategories.forEach(cat => {
+        tagElements[cat].textContent = animal.tags[cat] || '';
+      });
     }
 
     function navigate(direction) {
