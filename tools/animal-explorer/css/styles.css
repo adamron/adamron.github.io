@@ -1,0 +1,366 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  min-height: 100vh;
+  color: #eee;
+  overflow-x: hidden;
+}
+
+/* Gallery View */
+.gallery {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.gallery-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.back-link:hover {
+  color: #eee;
+}
+
+.gallery h1 {
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+
+/* Filters */
+.filters {
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.filters-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #eee;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.filters-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filters-toggle-icon {
+  transition: transform 0.2s;
+}
+
+.filters.open .filters-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.filters-content {
+  display: none;
+  padding: 0 1rem 1rem;
+}
+
+.filters.open .filters-content {
+  display: block;
+}
+
+.filter-group {
+  margin-bottom: 0.75rem;
+}
+
+.filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-group-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-option {
+  padding: 0.3rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-option:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.filter-option.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.filter-option[data-category="biome"].active { background: rgba(34, 139, 34, 0.4); border-color: rgba(34, 139, 34, 0.6); }
+.filter-option[data-category="geography"].active { background: rgba(70, 130, 180, 0.4); border-color: rgba(70, 130, 180, 0.6); }
+.filter-option[data-category="class"].active { background: rgba(138, 43, 226, 0.4); border-color: rgba(138, 43, 226, 0.6); }
+.filter-option[data-category="diet"].active { background: rgba(255, 140, 0, 0.4); border-color: rgba(255, 140, 0, 0.6); }
+.filter-option[data-category="conservation"].active { background: rgba(220, 20, 60, 0.4); border-color: rgba(220, 20, 60, 0.6); }
+
+.filters-active-count {
+  font-size: 0.75rem;
+  color: #888;
+  margin-left: 0.5rem;
+}
+
+.clear-filters {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  margin-left: auto;
+}
+
+.clear-filters:hover {
+  color: #fff;
+}
+
+.animal-tile.hidden {
+  display: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.animal-tile {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.animal-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.animal-tile img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.animal-tile img[data-src] {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.animal-tile img.loaded {
+  opacity: 1;
+}
+
+.animal-tile .name {
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Detail View */
+.detail {
+  position: fixed;
+  inset: 0;
+  background: #0a0a14;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.detail.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.detail-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  z-index: 10;
+}
+
+.detail-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #eee;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+.detail-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.detail-content img {
+  width: min(66vw, 66vh);
+  height: min(66vw, 66vh);
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.detail-content img.dragging {
+  transition: none;
+}
+
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #eee;
+  font-size: 2rem;
+  padding: 1rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 5;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-btn.prev {
+  left: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.nav-btn.next {
+  right: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.counter {
+  text-align: center;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.detail-info {
+  padding: 0.75rem 1.5rem 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tag-label {
+  color: #888;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.tag-value {
+  color: #eee;
+}
+
+.tag[data-category="biome"] { background: rgba(34, 139, 34, 0.3); }
+.tag[data-category="geography"] { background: rgba(70, 130, 180, 0.3); }
+.tag[data-category="class"] { background: rgba(138, 43, 226, 0.3); }
+.tag[data-category="diet"] { background: rgba(255, 140, 0, 0.3); }
+.tag[data-category="conservation"] { background: rgba(220, 20, 60, 0.3); }
+
+@media (max-width: 600px) {
+  .gallery {
+    padding: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    padding: 0.75rem 0.5rem;
+    font-size: 1.5rem;
+  }
+}

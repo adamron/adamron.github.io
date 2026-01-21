@@ -1,9 +1,16 @@
-const CACHE_NAME = 'tools-v3';
+const CACHE_NAME = 'tools-v4';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/tools/animal-explorer/index.html',
+  '/tools/animal-explorer/css/styles.css',
+  '/tools/animal-explorer/js/state.js',
+  '/tools/animal-explorer/js/filters.js',
+  '/tools/animal-explorer/js/gallery.js',
+  '/tools/animal-explorer/js/detail.js',
+  '/tools/animal-explorer/js/navigation.js',
+  '/tools/animal-explorer/js/app.js',
   '/tools/animal-explorer/images/thumbs/african-elephant.jpg',
   '/tools/animal-explorer/images/thumbs/albatross.jpg',
   '/tools/animal-explorer/images/thumbs/anglerfish.jpg',
