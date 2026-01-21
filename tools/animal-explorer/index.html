@@ -610,6 +610,29 @@
       tagCategories.forEach(cat => {
         tagElements[cat].textContent = animal.tags[cat] || '';
       });
+
+      // Preload adjacent images
+      preloadAdjacentImages(filteredPos - 1);
+    }
+
+    // Preload cache to avoid creating duplicate Image objects
+    const preloadCache = new Set();
+
+    function preloadAdjacentImages(filteredPos) {
+      if (filteredIndices.length <= 1) return;
+
+      const prevPos = filteredPos === 0 ? filteredIndices.length - 1 : filteredPos - 1;
+      const nextPos = filteredPos === filteredIndices.length - 1 ? 0 : filteredPos + 1;
+
+      [prevPos, nextPos].forEach(pos => {
+        const animalIndex = filteredIndices[pos];
+        const imageSrc = animals[animalIndex].image;
+        if (imageSrc && !preloadCache.has(imageSrc)) {
+          preloadCache.add(imageSrc);
+          const img = new Image();
+          img.src = imageSrc;
+        }
+      });
     }
 
     function navigate(direction) {
