@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>Procedural Terrain Generation</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,4 28,28 4,28' fill='%235a9a6a'/><polygon points='22,12 30,28 14,28' fill='%23457a52'/></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<article class="article">
+
+  <!-- Header -->
+  <header class="article-header">
+    <a href="../../index.html" class="back-link">&larr; Adam's Tools</a>
+    <h1>Procedural Terrain</h1>
+    <p class="subtitle">
+      How a handful of mathematical ideas combine to create
+      infinite, believable landscapes from nothing but numbers.
+    </p>
+  </header>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#randomness">The Problem with Randomness</a></li>
+      <li><a href="#smooth-noise">Making Noise Smooth</a></li>
+      <li><a href="#octaves">Layering Detail</a></li>
+      <li><a href="#gradient-noise">Gradient Noise</a></li>
+      <li><a href="#two-dimensions">Going to Two Dimensions</a></li>
+      <li><a href="#heightmap-to-mesh">From Heightmap to Terrain</a></li>
+      <li><a href="#shaping">Shaping the Land</a></li>
+      <li><a href="#color">Adding Color</a></li>
+      <li><a href="#erosion">Erosion</a></li>
+      <li><a href="#putting-it-together">Putting It All Together</a></li>
+    </ol>
+  </nav>
+
+  <!-- ==========================================
+       Section 1: Randomness
+       ========================================== -->
+  <section class="section" id="randomness">
+    <h2>The Problem with Randomness</h2>
+
+    <p>
+      If you've ever played a game with an infinite world, or watched a film with
+      sweeping shots over computer-generated mountains, you've seen procedural
+      terrain. The landscapes aren't hand-sculpted — they're grown from algorithms.
+      But how do you get from code to something that looks like nature?
+    </p>
+
+    <p>
+      The most naive approach is the most tempting: just pick a random height for
+      each point. After all, terrain is irregular, and randomness is about as
+      irregular as you can get.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="random-1d"
+           data-description="1D strip of purely random height values — notice how jagged and unnatural it looks">
+      </div>
+      <div class="demo-caption">
+        Each bar is an independently random height. Drag to regenerate.
+      </div>
+    </div>
+
+    <p>
+      The result is hopeless. Every point is completely unrelated to its neighbors,
+      so you get a violent, spiky mess that looks nothing like real terrain. Nature
+      doesn't work this way — the height of a hillside at one point is closely
+      related to the height a meter away. There is <strong>spatial
+      correlation</strong>.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Real terrain is locally smooth but globally varied. We need noise that
+        respects this: nearby points should have similar values, while distant
+        points can differ freely.
+      </p>
+    </div>
+
+    <p>
+      To get there, we need to replace pure randomness with something
+      more structured. We need <em>smooth noise</em>.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 2: Smooth Noise
+       ========================================== -->
+  <section class="section" id="smooth-noise">
+    <h2>Making Noise Smooth</h2>
+
+    <p>
+      The idea behind smooth noise is simple. Instead of assigning a random value
+      to every single point, we only pick random values at regular intervals — let's
+      call these <strong>lattice points</strong>. For everything in between, we
+      smoothly blend from one lattice value to the next.
+    </p>
+
+    <p>
+      This blending is called <strong>interpolation</strong>, and the choice of
+      interpolation method matters more than you might think. The simplest option
+      is linear interpolation: draw a straight line between each pair of lattice
+      points. It's fast, but it creates sharp kinks at every lattice point, and
+      those kinks are clearly visible.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="value-noise-1d"
+           data-description="1D value noise — random values at lattice points with smooth interpolation between them">
+      </div>
+      <div class="demo-controls">
+        <label>Frequency <input type="range" min="2" max="20" value="8" data-control="frequency"></label>
+      </div>
+      <div class="demo-caption">
+        Dots mark the random lattice points. The curve interpolates between them.
+        Adjust frequency to change how many lattice points fit in the space.
+      </div>
+    </div>
+
+    <p>
+      A much better choice is a smooth-step function — one that starts and ends
+      with zero slope, producing a curve that flows gently through each lattice
+      point. Ken Perlin used the polynomial
+      <code>6t<sup>5</sup> - 15t<sup>4</sup> + 10t<sup>3</sup></code>,
+      which has the nice property that both its first <em>and</em> second
+      derivatives are zero at the lattice points. This means no visible kinks and
+      no sudden changes in curvature.
+    </p>
+
+    <h3>Frequency and wavelength</h3>
+
+    <p>
+      Notice the <em>frequency</em> control above. When frequency is low, the
+      lattice points are far apart and the noise has broad, gentle hills. Crank
+      it up and you get tight, rapid variation. The frequency controls the
+      <strong>scale of detail</strong> — and this turns out to be the single most
+      important lever in procedural terrain.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Frequency determines the scale of features in noise. Low frequency
+        produces large, rolling hills. High frequency produces fine detail. Real
+        terrain has features at <em>every</em> scale simultaneously.
+      </p>
+    </div>
+
+    <p>
+      But a single frequency of noise still looks too simple and regular to pass
+      for terrain. Real mountains have broad slopes <em>and</em> small bumps
+      <em>and</em> tiny rocks — detail at every scale. To get there, we need to
+      combine noise at multiple frequencies.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 3: Octaves / fBm
+       ========================================== -->
+  <section class="section" id="octaves">
+    <h2>Layering Detail</h2>
+
+    <p>
+      The technique is beautifully simple: take your smooth noise function and call
+      it multiple times, each time doubling the frequency and halving the amplitude.
+      Then add up all the results.
+    </p>
+
+    <p>
+      The first layer — the lowest frequency — defines the broad shape: the
+      mountains and valleys. The second layer adds medium-scale variation: ridges
+      and foothills. Each successive layer contributes finer and finer detail.
+      These layers are called <strong>octaves</strong>, borrowing the musical term
+      because each one doubles in frequency, just like notes an octave apart.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="octaves-1d"
+           data-description="Individual octaves of noise shown separately, then combined into the final signal">
+      </div>
+      <div class="demo-controls">
+        <label>Octaves <input type="range" min="1" max="8" value="4" data-control="octaves"></label>
+        <label>Persistence <input type="range" min="0" max="100" value="50" data-control="persistence"></label>
+        <label>Lacunarity <input type="range" min="100" max="400" value="200" data-control="lacunarity"></label>
+      </div>
+      <div class="demo-caption">
+        Each colored line is one octave. The white line is their sum.
+        Persistence controls how much each octave contributes. Lacunarity controls
+        the frequency multiplier between octaves.
+      </div>
+    </div>
+
+    <p>
+      Two parameters control the layering:
+    </p>
+
+    <p>
+      <strong>Persistence</strong> (sometimes called <em>gain</em>) determines how
+      much each successive octave contributes relative to the last. A persistence
+      of 0.5 means each octave has half the amplitude of the one before it. Lower
+      values produce smoother terrain; higher values make the fine detail more
+      prominent.
+    </p>
+
+    <p>
+      <strong>Lacunarity</strong> controls the frequency ratio between octaves.
+      The standard value is 2.0 (each octave is double the frequency), but you can
+      adjust it for different characteristics.
+    </p>
+
+    <span class="formula">
+      result = &sum; amplitude<sup>i</sup> &times; noise(position &times; frequency<sup>i</sup>)
+    </span>
+
+    <p>
+      This sum-of-octaves approach is formally known as <strong>fractal Brownian
+      motion</strong> (fBm). The name reflects the fact that natural terrain is
+      fractal — it has statistical self-similarity at different scales. A coastline
+      looks equally jagged whether you view it from an airplane or from the ground.
+      Our layered noise captures exactly this property.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Fractal Brownian motion (fBm) layers multiple octaves of noise to create
+        detail at every scale. This is the fundamental building block of
+        procedural terrain.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 4: Gradient Noise
+       ========================================== -->
+  <section class="section" id="gradient-noise">
+    <h2>Gradient Noise</h2>
+
+    <p>
+      The noise we've built so far — assigning random <em>values</em> at lattice
+      points and interpolating — is called <strong>value noise</strong>. It works,
+      but it has a subtle problem. Because the random values are independently
+      chosen, the noise tends to develop a blocky, grid-aligned character,
+      especially when you look at it in two dimensions. The lattice structure
+      shows through.
+    </p>
+
+    <p>
+      In 1983, Ken Perlin had a key insight. Instead of assigning random
+      <em>values</em> at each lattice point, assign random <em>gradients</em> —
+      directions. The noise value at any point is determined by how far it is from
+      each surrounding lattice point, dotted with that point's gradient. This small
+      change has a profound effect: the noise becomes zero at every lattice point,
+      and the features arise from the interplay of gradients, producing a much more
+      organic result.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-split">
+        <div class="demo-canvas-wrap"
+             data-demo="value-vs-perlin-left"
+             data-description="Value noise — random values at lattice points">
+        </div>
+        <div class="demo-canvas-wrap"
+             data-demo="value-vs-perlin-right"
+             data-description="Gradient (Perlin) noise — random gradients at lattice points">
+        </div>
+      </div>
+      <div class="demo-caption">
+        Value noise (left) vs gradient noise (right). Notice how the gradient
+        version lacks the grid-aligned artifacts and has a more natural flow.
+      </div>
+    </div>
+
+    <p>
+      The gradient approach also composes better with fBm — the octaves blend
+      without reinforcing the grid pattern. This is why Perlin noise became the
+      standard for procedural generation and won Ken Perlin an Academy Award for
+      Technical Achievement.
+    </p>
+
+    <p>
+      In 2001, Perlin improved his algorithm further with <strong>simplex
+      noise</strong>, which uses a triangular (simplex) grid instead of a square
+      one and scales better to higher dimensions. More recently, open-source
+      alternatives like <strong>OpenSimplex</strong> have become popular. For our
+      purposes, the exact variant matters less than the core principle: gradients
+      produce better noise than values.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 5: Two Dimensions
+       ========================================== -->
+  <section class="section" id="two-dimensions">
+    <h2>Going to Two Dimensions</h2>
+
+    <p>
+      Everything we've done so far has been in one dimension — a single line of
+      heights. To make terrain, we need a two-dimensional noise function: give it
+      an <code>(x, y)</code> coordinate, get back a height value.
+    </p>
+
+    <p>
+      The extension is natural. Instead of lattice points on a line, we have a grid
+      of lattice points on a plane. Each lattice point gets a random 2D gradient
+      vector. To evaluate the noise at any point, we look at the four surrounding
+      lattice points (or six, for simplex noise), compute the dot product of each
+      gradient with the displacement vector to our point, and interpolate
+      the results.
+    </p>
+
+    <p>
+      The result can be visualized as a grayscale image: a <strong>heightmap</strong>.
+      Each pixel's brightness represents height — black for the lowest points,
+      white for the highest.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap square"
+           data-demo="heightmap-2d"
+           data-description="2D noise heightmap — grayscale image where brightness represents height">
+      </div>
+      <div class="demo-controls">
+        <label>Frequency <input type="range" min="1" max="16" value="4" data-control="frequency"></label>
+        <label>Octaves <input type="range" min="1" max="8" value="5" data-control="octaves"></label>
+        <label>Persistence <input type="range" min="0" max="100" value="50" data-control="persistence"></label>
+      </div>
+      <div class="demo-caption">
+        A 2D heightmap generated with fractal noise. Adjust parameters to see how
+        they affect the landscape structure.
+      </div>
+    </div>
+
+    <p>
+      Already you can start to see terrain-like structure. The broad light regions
+      are highlands; the dark areas are valleys. But it's still just a flat image.
+      To really feel like terrain, we need to lift it into three dimensions.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 6: Heightmap to Mesh
+       ========================================== -->
+  <section class="section" id="heightmap-to-mesh">
+    <h2>From Heightmap to Terrain</h2>
+
+    <p>
+      A heightmap is a grid of numbers. To turn it into a visible landscape, we
+      create a mesh of triangles — a 3D surface where each vertex's vertical
+      position is set by the corresponding heightmap value.
+    </p>
+
+    <p>
+      The process is straightforward: lay out a flat grid of vertices, then push
+      each one up or down according to the noise value at its position. Connect
+      adjacent vertices into triangles, compute surface normals for lighting, and
+      you have a terrain mesh.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="terrain-mesh"
+           data-description="3D terrain mesh generated from a noise heightmap — orbit with mouse/touch">
+      </div>
+      <div class="demo-controls">
+        <label>Height scale <input type="range" min="0" max="100" value="50" data-control="height-scale"></label>
+        <label>Resolution <input type="range" min="16" max="256" value="128" data-control="resolution"></label>
+        <label>Wireframe <input type="range" min="0" max="1" value="0" data-control="wireframe"></label>
+      </div>
+      <div class="demo-caption">
+        A 3D terrain mesh. Click and drag to orbit. Scroll to zoom. Toggle
+        wireframe to see the triangle structure.
+      </div>
+    </div>
+
+    <p>
+      Even with basic flat shading, the shape of the land is immediately
+      recognizable. But it still doesn't quite look <em>right</em>. The noise
+      produces a statistically uniform surface — every region has roughly the same
+      character. Real terrain isn't like that. Valleys are flat, ridges are sharp,
+      and coastlines have a particular shape. We need to sculpt the raw noise.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 7: Shaping
+       ========================================== -->
+  <section class="section" id="shaping">
+    <h2>Shaping the Land</h2>
+
+    <p>
+      Raw noise gives us a reasonable starting distribution of heights, but real
+      terrain has specific structural properties that noise alone can't capture. We
+      can fix this by applying mathematical operations to the noise output — think
+      of them as sculpting tools.
+    </p>
+
+    <h3>Redistribution</h3>
+
+    <p>
+      The simplest transformation is to pass the noise through a power function.
+      Raising the height to an exponent greater than 1 pushes low values lower
+      while keeping high values high, creating flat plains with sharply rising
+      peaks. An exponent less than 1 does the opposite — flattening the peaks
+      while lifting the valleys.
+    </p>
+
+    <span class="formula">
+      height' = height<sup>exponent</sup>
+    </span>
+
+    <h3>Terracing</h3>
+
+    <p>
+      Another useful technique is terracing: quantizing the height values into
+      discrete steps. This creates plateau-like formations with sharp cliff
+      edges between them. By blending between the original and terraced
+      values, you can control how pronounced the effect is.
+    </p>
+
+    <h3>Domain warping</h3>
+
+    <p>
+      Perhaps the most powerful shaping technique is <strong>domain
+      warping</strong>. Instead of transforming the output of the noise function,
+      we transform its <em>input</em>. Before evaluating noise at a point, we
+      offset that point by the value of another noise function. This warps the
+      coordinate space, bending and stretching the noise in organic, swirling
+      patterns.
+    </p>
+
+    <span class="formula">
+      height = noise(position + noise(position))
+    </span>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="shaping"
+           data-description="The same base terrain with different shaping functions applied: redistribution, terracing, and domain warping">
+      </div>
+      <div class="demo-controls">
+        <label>Exponent <input type="range" min="10" max="400" value="100" data-control="exponent"></label>
+        <label>Terraces <input type="range" min="0" max="20" value="0" data-control="terraces"></label>
+        <label>Warp strength <input type="range" min="0" max="100" value="0" data-control="warp"></label>
+      </div>
+      <div class="demo-caption">
+        Experiment with different shaping parameters. The base noise is the same —
+        only the post-processing changes.
+      </div>
+    </div>
+
+    <p>
+      Domain warping is particularly interesting because it can create shapes that
+      look almost geological — winding river valleys, natural-looking mountain
+      chains, and irregular coastlines. It's used extensively in film VFX to add
+      visual complexity to terrain.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Shaping functions transform raw noise into terrain with specific character.
+        Redistribution controls the height profile, terracing creates cliffs and
+        plateaus, and domain warping adds organic distortion.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 8: Color
+       ========================================== -->
+  <section class="section" id="color">
+    <h2>Adding Color</h2>
+
+    <p>
+      A gray terrain mesh is structurally correct but visually lifeless. To make it
+      convincing, we map height to color, mimicking how real biomes distribute
+      across elevation.
+    </p>
+
+    <p>
+      The idea is a <strong>color ramp</strong> — a function that takes a height
+      value (0 to 1) and returns a color. Deep areas are dark blue (water). Just
+      above the waterline is sandy beach. Moving upward: grassland, forest, bare
+      rock, and finally snow-capped peaks.
+    </p>
+
+    <p>
+      To avoid perfectly horizontal color bands, we can introduce some noise into
+      the thresholds, or blend between biomes over a transition zone rather than
+      switching abruptly. The slope of the terrain also matters — steep areas
+      should show exposed rock regardless of elevation.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="colored-terrain"
+           data-description="Terrain mesh colored by elevation: water, sand, grass, rock, and snow">
+      </div>
+      <div class="demo-controls">
+        <label>Water level <input type="range" min="0" max="100" value="40" data-control="water-level"></label>
+        <label>Snow line <input type="range" min="0" max="100" value="80" data-control="snow-line"></label>
+      </div>
+      <div class="demo-caption">
+        Height-based coloring gives the terrain biome zones. Adjust the water level
+        and snow line to reshape the landscape.
+      </div>
+    </div>
+
+    <p>
+      The color ramp makes a dramatic difference. What was an abstract shape
+      suddenly reads as a landscape — you can see where the water would collect,
+      where forests would grow, and where the peaks break above the treeline.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 9: Erosion
+       ========================================== -->
+  <section class="section" id="erosion">
+    <h2>Erosion</h2>
+
+    <p>
+      The terrain we've built so far is a good approximation, but it has a quality
+      that's hard to pin down: it looks <em>generated</em>. Real landscapes don't
+      just emerge from mathematical functions — they're shaped over millions of
+      years by physical processes. The most important of these is erosion.
+    </p>
+
+    <h3>Hydraulic erosion</h3>
+
+    <p>
+      Water is the sculptor of the earth. Rain falls, collects into streams, and
+      flows downhill. As it flows, it picks up sediment from the ground beneath it.
+      Where the water slows down — in flat areas or wide basins — it deposits that
+      sediment. Over time, this carves valleys, creates river channels, and
+      smooths slopes into the characteristic shapes we recognize as natural.
+    </p>
+
+    <p>
+      To simulate this, we drop virtual water droplets onto the terrain. Each
+      droplet follows the path of steepest descent, picking up sediment as it
+      moves and depositing it when it slows down or pools. After thousands of
+      droplets, the terrain develops the telltale signatures of water erosion:
+      branching river networks, alluvial fans, and carved gorges.
+    </p>
+
+    <h3>Thermal erosion</h3>
+
+    <p>
+      Gravity also plays a role. When the slope between two adjacent points exceeds
+      a threshold (the <strong>talus angle</strong>), material slides downhill. This
+      is thermal erosion — the physical process that causes scree slopes at the base
+      of cliffs and prevents impossibly steep formations from persisting.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="erosion"
+           data-description="Terrain before and after erosion simulation — notice the carved valleys and natural-looking drainage patterns">
+      </div>
+      <div class="demo-controls">
+        <label>Droplets <input type="range" min="0" max="100000" value="20000" data-control="droplets"></label>
+        <label>Erosion rate <input type="range" min="0" max="100" value="50" data-control="erosion-rate"></label>
+        <label>Deposition rate <input type="range" min="0" max="100" value="30" data-control="deposition-rate"></label>
+      </div>
+      <div class="demo-caption">
+        Drag the slider to increase the number of water droplets. Watch how the
+        terrain gradually develops natural drainage patterns.
+      </div>
+    </div>
+
+    <div class="key-idea">
+      <p>
+        Erosion is what separates "noise terrain" from "believable terrain."
+        Even a simplified hydraulic erosion simulation dramatically improves
+        the realism of procedurally generated landscapes.
+      </p>
+    </div>
+
+    <p>
+      The difference between pre- and post-erosion terrain is striking. Before
+      erosion, the terrain has that smooth, blobby quality of raw noise. After,
+      it's full of sharp ridges, V-shaped valleys, and the kind of fine-grained
+      detail that our eyes associate with real rock and soil.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 10: Putting It Together
+       ========================================== -->
+  <section class="section" id="putting-it-together">
+    <h2>Putting It All Together</h2>
+
+    <p>
+      Each technique we've explored — smooth noise, fractal layering, gradient
+      noise, shaping, coloring, and erosion — solves a specific problem. On their
+      own, they're interesting. Combined, they produce something remarkable.
+    </p>
+
+    <p>
+      The pipeline is:
+    </p>
+
+    <p>
+      <strong>1. Generate base noise</strong> — Use gradient noise with fBm (4-8
+      octaves) to create the fundamental height distribution.
+    </p>
+
+    <p>
+      <strong>2. Shape the terrain</strong> — Apply redistribution to set the
+      height profile, domain warping for organic distortion, and any special
+      effects like terracing.
+    </p>
+
+    <p>
+      <strong>3. Simulate erosion</strong> — Run hydraulic and thermal erosion
+      passes to carve realistic drainage patterns and smooth impossibly steep
+      slopes.
+    </p>
+
+    <p>
+      <strong>4. Color by biome</strong> — Map the final heights (and slopes) to
+      terrain colors, giving the landscape its visual identity.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="full-terrain"
+           data-description="Complete terrain generator — all systems combined with full parameter control"
+           style="aspect-ratio: 16 / 9;">
+      </div>
+      <div class="demo-controls">
+        <label>Seed <input type="range" min="0" max="1000" value="42" data-control="seed"></label>
+        <label>Octaves <input type="range" min="1" max="8" value="6" data-control="octaves"></label>
+        <label>Height <input type="range" min="0" max="100" value="60" data-control="height-scale"></label>
+        <label>Erosion <input type="range" min="0" max="100" value="40" data-control="erosion"></label>
+        <label>Water level <input type="range" min="0" max="100" value="35" data-control="water-level"></label>
+      </div>
+      <div class="demo-caption">
+        The complete terrain pipeline. Change the seed for a new landscape.
+        Orbit with mouse, scroll to zoom.
+      </div>
+    </div>
+
+    <p>
+      What's remarkable about this approach is its economy. The entire landscape —
+      every ridge, valley, and plateau — is defined by a handful of parameters and
+      a seed value. Change the seed and you get an entirely different world, equally
+      detailed and equally plausible. This is the power of procedural generation:
+      infinite variety from finite rules.
+    </p>
+
+    <p>
+      The techniques we've covered here are the foundation. Real-world terrain
+      engines build on them with additional layers: vegetation placement using
+      Poisson disk sampling, atmospheric scattering for distant mountains, level-of-detail
+      systems for rendering terrain that stretches to the horizon. But at their core,
+      they all start where we started — with a question about how to turn randomness
+      into something that looks like nature.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="article-footer">
+    <p>
+      <a href="../../index.html">&larr; Back to Adam's Tools</a>
+    </p>
+  </footer>
+
+</article>
+
+<!-- Scripts: app.js defines the registry, then demos register, then init runs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/app.js"></script>
+<script src="js/noise.js"></script>
+<script src="js/three-setup.js"></script>
+<script src="js/random-1d.js"></script>
+<script src="js/value-noise-1d.js"></script>
+<script src="js/octaves-1d.js"></script>
+<script src="js/value-vs-perlin.js"></script>
+<script src="js/heightmap-2d.js"></script>
+<script src="js/terrain-mesh.js"></script>
+<script src="js/shaping.js"></script>
+<script src="js/colored-terrain.js"></script>
+<script src="js/erosion.js"></script>
+<script src="js/full-terrain.js"></script>
+<script>initAll();</script>
+
+</body>
+</html>

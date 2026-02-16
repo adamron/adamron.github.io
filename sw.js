@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v5';
+const CACHE_NAME = 'tools-v6';
 const ASSETS = [
   '/',
   '/index.html',
@@ -82,7 +82,22 @@ const ASSETS = [
   '/tools/animal-explorer/images/thumbs/wolverine.jpg',
   '/tools/animal-explorer/images/thumbs/wombat.jpg',
   '/tools/animal-explorer/images/thumbs/zebra.jpg',
-  '/tools/chess/index.html'
+  '/tools/chess/index.html',
+  '/tools/terrain/index.html',
+  '/tools/terrain/css/styles.css',
+  '/tools/terrain/js/app.js',
+  '/tools/terrain/js/random-1d.js',
+  '/tools/terrain/js/value-noise-1d.js',
+  '/tools/terrain/js/octaves-1d.js',
+  '/tools/terrain/js/value-vs-perlin.js',
+  '/tools/terrain/js/noise.js',
+  '/tools/terrain/js/heightmap-2d.js',
+  '/tools/terrain/js/terrain-mesh.js',
+  '/tools/terrain/js/three-setup.js',
+  '/tools/terrain/js/shaping.js',
+  '/tools/terrain/js/colored-terrain.js',
+  '/tools/terrain/js/erosion.js',
+  '/tools/terrain/js/full-terrain.js'
 ];
 
 self.addEventListener('install', event => {
