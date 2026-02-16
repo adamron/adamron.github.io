@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v4';
+const CACHE_NAME = 'tools-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -81,7 +81,8 @@ const ASSETS = [
   '/tools/animal-explorer/images/thumbs/white-rhinoceros.jpg',
   '/tools/animal-explorer/images/thumbs/wolverine.jpg',
   '/tools/animal-explorer/images/thumbs/wombat.jpg',
-  '/tools/animal-explorer/images/thumbs/zebra.jpg'
+  '/tools/animal-explorer/images/thumbs/zebra.jpg',
+  '/tools/chess/index.html'
 ];
 
 self.addEventListener('install', event => {

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a2e">
+  <title>Chess — Adam's Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #eee;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .back-link {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+    .back-link:hover { color: #eee; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    #status {
+      color: #aaa;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      min-height: 1.4em;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      width: min(70vw, 560px);
+      height: min(70vw, 560px);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .square {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: min(7vw, 56px);
+      cursor: pointer;
+      position: relative;
+      line-height: 1;
+    }
+
+    .square.light { background: #f0d9b5; }
+    .square.dark { background: #b58863; }
+
+    .square .piece-w { color: #fff8e7; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+    .square .piece-b { color: #2c1b0e; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+    .square.selected {
+      outline: 3px solid #00e5ff;
+      outline-offset: -3px;
+      background: rgba(0, 229, 255, 0.3) !important;
+    }
+
+    .square.move::after {
+      content: '';
+      position: absolute;
+      width: 28%;
+      height: 28%;
+      background: rgba(0, 180, 80, 0.6);
+      border-radius: 50%;
+    }
+
+    .square.capture {
+      box-shadow: inset 0 0 0 4px rgba(220, 40, 40, 0.7);
+    }
+
+    .square.last-move {
+      background: rgba(255, 255, 100, 0.25) !important;
+    }
+
+    .square.check {
+      background: rgba(220, 40, 40, 0.5) !important;
+    }
+
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 0.5rem 1.2rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #eee;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .controls button:hover { background: rgba(255,255,255,0.2); }
+
+    #midi-status {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .promo-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .promo-overlay.active { display: flex; }
+
+    .promo-box {
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .promo-box p { margin-bottom: 1rem; font-size: 1rem; }
+
+    .promo-options {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .promo-options button {
+      font-size: 2.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      line-height: 1;
+    }
+    .promo-options button:hover { background: rgba(255,255,255,0.2); }
+
+    @media (max-width: 480px) {
+      body { padding: 0.75rem; }
+      h1 { font-size: 1.5rem; }
+      .board {
+        width: 92vw;
+        height: 92vw;
+      }
+      .square { font-size: 9vw; }
+      .controls { flex-direction: column; }
+      .controls button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../../index.html" class="back-link">← Adam's Tools</a>
+    <h1>Chess</h1>
+    <div id="status">White to move</div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="container">
+    <div class="controls">
+      <button onclick="newGame()">New Game</button>
+      <button onclick="undo()">Undo</button>
+    </div>
+    <div id="midi-status">MIDI: Disconnected</div>
+  </div>
+
+  <div class="promo-overlay" id="promo-overlay">
+    <div class="promo-box">
+      <p>Promote pawn to:</p>
+      <div class="promo-options" id="promo-options"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script>
+    var game = new Chess();
+    var selectedSquare = null;
+    var legalMoves = [];
+    var lastMove = null;
+    var pendingPromoFrom = null;
+    var pendingPromoTo = null;
+
+    var launchpadInput = null;
+    var launchpadOutput = null;
+
+    var PIECE_UNICODE = {
+      wK: '\u2654', wQ: '\u2655', wR: '\u2656', wB: '\u2657', wN: '\u2658', wP: '\u2659',
+      bK: '\u265A', bQ: '\u265B', bR: '\u265C', bB: '\u265D', bN: '\u265E', bP: '\u265F'
+    };
+
+    var FILES = ['a','b','c','d','e','f','g','h'];
+
+    // --- Board rendering ---
+
+    function createBoard() {
+      var board = document.getElementById('board');
+      board.innerHTML = '';
+      for (var r = 7; r >= 0; r--) {
+        for (var f = 0; f < 8; f++) {
+          var sq = FILES[f] + (r + 1);
+          var cell = document.createElement('div');
+          cell.className = 'square ' + ((r + f) % 2 === 0 ? 'dark' : 'light');
+          cell.dataset.square = sq;
+          cell.addEventListener('click', (function(s) {
+            return function() { onSquareClick(s); };
+          })(sq));
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function renderBoard() {
+      var boardState = game.board();
+      var cells = document.querySelectorAll('.square');
+      cells.forEach(function(cell) {
+        var sq = cell.dataset.square;
+        var f = FILES.indexOf(sq[0]);
+        var r = parseInt(sq[1]) - 1;
+        cell.className = 'square ' + ((r + f) % 2 === 0 ? 'dark' : 'light');
+        var piece = boardState[7 - r][f];
+        if (piece) {
+          var key = piece.color + piece.type.toUpperCase();
+          var span = document.createElement('span');
+          span.className = 'piece-' + piece.color;
+          span.textContent = PIECE_UNICODE[key];
+          cell.innerHTML = '';
+          cell.appendChild(span);
+        } else {
+          cell.innerHTML = '';
+        }
+      });
+
+      // Apply last-move highlights
+      if (lastMove) {
+        var fromCell = document.querySelector('[data-square="' + lastMove.from + '"]');
+        var toCell = document.querySelector('[data-square="' + lastMove.to + '"]');
+        if (fromCell) fromCell.classList.add('last-move');
+        if (toCell) toCell.classList.add('last-move');
+      }
+
+      // Apply check highlight
+      if (game.in_check()) {
+        var turn = game.turn();
+        var cells2 = document.querySelectorAll('.square');
+        cells2.forEach(function(cell) {
+          var sq = cell.dataset.square;
+          var f = FILES.indexOf(sq[0]);
+          var r = parseInt(sq[1]) - 1;
+          var piece = boardState[7 - r][f];
+          if (piece && piece.type === 'k' && piece.color === turn) {
+            cell.classList.add('check');
+          }
+        });
+      }
+
+      updateLaunchpad();
+    }
+
+    // --- Interaction ---
+
+    function onSquareClick(square) {
+      if (pendingPromoFrom) return; // promotion modal open
+
+      var boardState = game.board();
+      var f = FILES.indexOf(square[0]);
+      var r = parseInt(square[1]) - 1;
+      var piece = boardState[7 - r][f];
+      var turn = game.turn();
+
+      if (!selectedSquare) {
+        // No piece selected yet
+        if (piece && piece.color === turn) {
+          selectSquare(square);
+        }
+      } else {
+        // A piece is already selected
+        var isLegalTarget = legalMoves.some(function(m) { return m.to === square; });
+        if (isLegalTarget) {
+          makeMove(selectedSquare, square);
+        } else if (piece && piece.color === turn && square !== selectedSquare) {
+          // Select a different own piece
+          selectSquare(square);
+        } else {
+          clearHighlights();
+          selectedSquare = null;
+          legalMoves = [];
+          updateLaunchpad();
+        }
+      }
+    }
+
+    function selectSquare(square) {
+      clearHighlights();
+      selectedSquare = square;
+      legalMoves = game.moves({ square: square, verbose: true });
+
+      var cell = document.querySelector('[data-square="' + square + '"]');
+      if (cell) cell.classList.add('selected');
+
+      legalMoves.forEach(function(m) {
+        var target = document.querySelector('[data-square="' + m.to + '"]');
+        if (!target) return;
+        if (m.captured) {
+          target.classList.add('capture');
+        } else {
+          target.classList.add('move');
+        }
+      });
+
+      updateLaunchpadHighlights();
+    }
+
+    function makeMove(from, to) {
+      // Check if promotion
+      var boardState = game.board();
+      var f = FILES.indexOf(from[0]);
+      var r = parseInt(from[1]) - 1;
+      var piece = boardState[7 - r][f];
+      var toRank = parseInt(to[1]);
+
+      if (piece && piece.type === 'p' && (toRank === 8 || toRank === 1)) {
+        showPromotionModal(from, to, piece.color);
+        return;
+      }
+
+      var move = game.move({ from: from, to: to });
+      if (move) {
+        lastMove = { from: from, to: to };
+        selectedSquare = null;
+        legalMoves = [];
+        renderBoard();
+        updateStatus();
+      }
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('.square.selected, .square.move, .square.capture').forEach(function(c) {
+        c.classList.remove('selected', 'move', 'capture');
+      });
+    }
+
+    function updateStatus() {
+      var el = document.getElementById('status');
+      var turn = game.turn() === 'w' ? 'White' : 'Black';
+
+      if (game.in_checkmate()) {
+        var winner = game.turn() === 'w' ? 'Black' : 'White';
+        el.textContent = 'Checkmate! ' + winner + ' wins.';
+      } else if (game.in_stalemate()) {
+        el.textContent = 'Stalemate — draw.';
+      } else if (game.in_draw()) {
+        el.textContent = 'Draw.';
+      } else if (game.in_check()) {
+        el.textContent = turn + ' to move — Check!';
+      } else {
+        el.textContent = turn + ' to move';
+      }
+    }
+
+    // --- Promotion ---
+
+    function showPromotionModal(from, to, color) {
+      pendingPromoFrom = from;
+      pendingPromoTo = to;
+      var overlay = document.getElementById('promo-overlay');
+      var options = document.getElementById('promo-options');
+      options.innerHTML = '';
+
+      var pieces = [
+        { piece: 'q', label: color === 'w' ? '\u2655' : '\u265B' },
+        { piece: 'r', label: color === 'w' ? '\u2656' : '\u265C' },
+        { piece: 'b', label: color === 'w' ? '\u2657' : '\u265D' },
+        { piece: 'n', label: color === 'w' ? '\u2658' : '\u265E' }
+      ];
+
+      pieces.forEach(function(p) {
+        var btn = document.createElement('button');
+        btn.textContent = p.label;
+        btn.className = color === 'w' ? 'piece-w' : 'piece-b';
+        btn.addEventListener('click', function() { completePromotion(p.piece); });
+        options.appendChild(btn);
+      });
+
+      overlay.classList.add('active');
+    }
+
+    function completePromotion(promotionPiece) {
+      var move = game.move({ from: pendingPromoFrom, to: pendingPromoTo, promotion: promotionPiece });
+      if (move) {
+        lastMove = { from: pendingPromoFrom, to: pendingPromoTo };
+      }
+      pendingPromoFrom = null;
+      pendingPromoTo = null;
+      document.getElementById('promo-overlay').classList.remove('active');
+      selectedSquare = null;
+      legalMoves = [];
+      renderBoard();
+      updateStatus();
+    }
+
+    // --- Controls ---
+
+    function newGame() {
+      game.reset();
+      selectedSquare = null;
+      legalMoves = [];
+      lastMove = null;
+      renderBoard();
+      updateStatus();
+    }
+
+    function undo() {
+      game.undo();
+      game.undo();
+      selectedSquare = null;
+      legalMoves = [];
+      var hist = game.history({ verbose: true });
+      lastMove = hist.length > 0 ? hist[hist.length - 1] : null;
+      renderBoard();
+      updateStatus();
+    }
+
+    // --- Launchpad MK2 MIDI ---
+
+    function squareToNote(sq) {
+      var f = FILES.indexOf(sq[0]) + 1;
+      var r = parseInt(sq[1]);
+      return r * 10 + f;
+    }
+
+    function noteToSquare(note) {
+      var f = (note % 10) - 1;
+      var r = Math.floor(note / 10);
+      if (f < 0 || f > 7 || r < 1 || r > 8) return null;
+      return FILES[f] + r;
+    }
+
+    var LP_COLORS = {
+      off: 0,
+      white: 3,
+      black: 45,
+      selected: 41,
+      move: 17,
+      capture: 5
+    };
+
+    async function connectMIDI() {
+      try {
+        var access = await navigator.requestMIDIAccess();
+        access.onstatechange = function(e) {
+          checkMIDIDevices(access);
+        };
+        checkMIDIDevices(access);
+      } catch (err) {
+        // MIDI not available
+      }
+    }
+
+    function checkMIDIDevices(access) {
+      launchpadInput = null;
+      launchpadOutput = null;
+
+      for (var input of access.inputs.values()) {
+        if (input.name.includes('Launchpad')) {
+          input.onmidimessage = onMIDIMessage;
+          launchpadInput = input;
+        }
+      }
+      for (var output of access.outputs.values()) {
+        if (output.name.includes('Launchpad')) {
+          launchpadOutput = output;
+        }
+      }
+
+      var statusEl = document.getElementById('midi-status');
+      if (launchpadOutput) {
+        statusEl.textContent = 'MIDI: Connected to ' + launchpadOutput.name;
+        statusEl.style.color = '#4caf50';
+        updateLaunchpad();
+      } else {
+        statusEl.textContent = 'MIDI: Disconnected';
+        statusEl.style.color = '#666';
+      }
+    }
+
+    function onMIDIMessage(event) {
+      var data = event.data;
+      var status = data[0];
+      var note = data[1];
+      var velocity = data[2];
+
+      // Note On
+      if (status === 144 && velocity > 0) {
+        var square = noteToSquare(note);
+        if (square) onSquareClick(square);
+      }
+    }
+
+    function updateLaunchpad() {
+      if (!launchpadOutput) return;
+
+      var boardState = game.board();
+      var highlightMap = {};
+
+      if (selectedSquare) {
+        highlightMap[selectedSquare] = LP_COLORS.selected;
+        legalMoves.forEach(function(m) {
+          highlightMap[m.to] = m.captured ? LP_COLORS.capture : LP_COLORS.move;
+        });
+      }
+
+      for (var r = 0; r < 8; r++) {
+        for (var f = 0; f < 8; f++) {
+          var sq = FILES[f] + (r + 1);
+          var note = squareToNote(sq);
+          var color;
+
+          if (highlightMap[sq] !== undefined) {
+            color = highlightMap[sq];
+          } else {
+            var piece = boardState[7 - r][f];
+            if (piece) {
+              color = piece.color === 'w' ? LP_COLORS.white : LP_COLORS.black;
+            } else {
+              color = LP_COLORS.off;
+            }
+          }
+
+          launchpadOutput.send([144, note, color]);
+        }
+      }
+    }
+
+    function updateLaunchpadHighlights() {
+      updateLaunchpad();
+    }
+
+    // --- Init ---
+    createBoard();
+    renderBoard();
+    updateStatus();
+    connectMIDI();
+  </script>
+</body>
+</html>
