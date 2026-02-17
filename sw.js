@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v7';
+const CACHE_NAME = 'tools-v9';
 const ASSETS = [
   '/',
   '/index.html',
@@ -107,6 +107,7 @@ const ASSETS = [
   '/tools/weather/js/coriolis.js',
   '/tools/weather/js/convection-cells.js',
   '/tools/weather/js/cloud-formation.js',
+  '/tools/weather/js/orographic.js',
   '/tools/weather/js/fronts.js',
   '/tools/weather/js/storm-cell.js',
   '/tools/weather/js/global-circulation.js',

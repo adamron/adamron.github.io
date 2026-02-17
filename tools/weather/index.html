@@ -32,6 +32,7 @@
       <li><a href="#coriolis">The Coriolis Effect</a></li>
       <li><a href="#convection">Convection</a></li>
       <li><a href="#moisture">Moisture & Clouds</a></li>
+      <li><a href="#terrain">Terrain</a></li>
       <li><a href="#fronts">Air Masses & Fronts</a></li>
       <li><a href="#storms">Storms</a></li>
       <li><a href="#circulation">Global Circulation</a></li>
@@ -489,7 +490,92 @@
   <hr class="section-break">
 
   <!-- ==========================================
-       Section 7: Air Masses & Fronts
+       Section 7: Terrain
+       ========================================== -->
+  <section class="section" id="terrain">
+    <h2>Terrain</h2>
+
+    <p>
+      So far, the forces that lift air — convection, fronts — come from the
+      atmosphere itself. But the most direct way to force air upward is to put
+      a mountain in its path. When wind encounters a mountain range, it has
+      nowhere to go but up. This is <strong>orographic lift</strong>, and it
+      connects straight back to what we learned about clouds: rising air cools,
+      and cooled air condenses.
+    </p>
+
+    <p>
+      The windward side of a mountain range — the side facing the incoming
+      wind — is where this lift is strongest. As moist air is pushed upward
+      along the slope, it cools at the dry adiabatic rate until it hits the
+      dew point and clouds form. Continued ascent wrings moisture out as
+      precipitation. Some of the wettest places on earth owe their rainfall
+      to orographic lift: the western Cascades, the southern Himalayas, the
+      Scottish Highlands. Cherrapunji, India, in the path of monsoon winds
+      hitting the Khasi Hills, receives over 11 meters of rain per year.
+    </p>
+
+    <p>
+      On the other side of the mountain — the <strong>leeward</strong> side —
+      something different happens. The air, having lost much of its moisture
+      as rain on the windward slopes, now descends. Descending air compresses
+      and warms, but because it lost water on the way up, it warms at the
+      <em>dry</em> adiabatic rate (10 &deg;C/km) rather than the slower moist
+      rate (5&ndash;6 &deg;C/km) it cooled at during ascent. The result: the
+      air arrives on the leeward side warmer <em>and</em> drier than it
+      started. This is the <strong>rain shadow</strong>.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="orographic"
+           data-description="Cross-section showing wind flowing over a mountain with clouds on the windward side and dry conditions in the rain shadow">
+      </div>
+      <div class="demo-controls">
+        <label>Mountain height <input type="range" min="0" max="100" value="60" data-control="mountain-height"></label>
+        <label>Moisture <input type="range" min="0" max="100" value="50" data-control="moisture"></label>
+      </div>
+      <div class="demo-caption">
+        Wind flows left to right over the mountain. Clouds and rain form on the
+        windward side where air is forced upward. The leeward side sits in the
+        rain shadow — warm and dry.
+      </div>
+    </div>
+
+    <p>
+      These warm, dry lee winds have names all over the world:
+      <strong>Foehn</strong> in the Alps, <strong>Chinook</strong> in the
+      Rockies, <strong>Santa Ana</strong> in southern California. A Chinook
+      can raise temperatures by 10&ndash;20 &deg;C in a matter of hours,
+      melting snow so fast that early settlers called it the "snow eater."
+      Santa Ana winds, hot and bone-dry after descending from the interior
+      mountains, are the driving force behind California's worst wildfire
+      seasons.
+    </p>
+
+    <p>
+      Rain shadows operate at every scale. The Rockies create a continental
+      rain shadow across the Great Plains. The Andes squeeze moisture from
+      Pacific trade winds, leaving the Atacama Desert — the driest place on
+      earth — in their lee. Even a modest hill can create a local dry pocket
+      on its downwind side. Wherever terrain interrupts the flow of moist air,
+      it reshapes precipitation patterns and, over time, entire ecosystems.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Mountains force air upward, producing clouds and precipitation on the
+        windward side. The leeward side receives warm, dry descending air — the
+        rain shadow. Terrain shapes precipitation patterns at every scale, from
+        local hills to continental mountain ranges.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 8: Air Masses & Fronts
        ========================================== -->
   <section class="section" id="fronts">
     <h2>Air Masses & Fronts</h2>
@@ -749,7 +835,7 @@
 
     <p>
       Each concept we've explored — heating, pressure, wind, Coriolis
-      deflection, convection, moisture, fronts, storms, and global
+      deflection, convection, moisture, terrain, fronts, storms, and global
       circulation — is a piece of the puzzle. On their own, they explain
       isolated phenomena. Combined, they produce the full complexity of
       weather.
@@ -808,11 +894,20 @@
         <label>Moisture <input type="range" min="0" max="100" value="50" data-control="moisture"></label>
         <label>Rotation <input type="range" min="0" max="100" value="50" data-control="rotation"></label>
         <label>Speed <input type="range" min="0" max="100" value="50" data-control="speed"></label>
+        <label>Terrain
+          <select data-control="terrain-type">
+            <option value="none">None</option>
+            <option value="coast">Coastal range</option>
+            <option value="divide">Central divide</option>
+            <option value="island">Island</option>
+          </select>
+        </label>
       </div>
       <div class="demo-caption">
         A 2D weather simulation combining all the systems. Temperature (color),
-        pressure (contours), wind (vectors), and clouds (white). Adjust
-        parameters to explore how the systems interact.
+        pressure (contours), wind (vectors), clouds (white), and terrain
+        (brown). Adjust parameters and select a terrain type to explore how
+        the systems interact.
       </div>
     </div>
 
@@ -853,6 +948,7 @@
 <script src="js/coriolis.js"></script>
 <script src="js/convection-cells.js"></script>
 <script src="js/cloud-formation.js"></script>
+<script src="js/orographic.js"></script>
 <script src="js/fronts.js"></script>
 <script src="js/storm-cell.js"></script>
 <script src="js/global-circulation.js"></script>

@@ -296,6 +296,17 @@ body {
   accent-color: #5a8aaa;
 }
 
+.demo-controls select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 4px;
+  color: #999;
+  font-size: 0.8rem;
+  font-family: inherit;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+}
+
 /* Side-by-side demo variant */
 .demo-split {
   display: grid;

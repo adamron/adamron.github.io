@@ -3,19 +3,23 @@
  * Top-down weather map with analytically prescribed pressure systems,
  * wind particles spiraling around them, and fronts extending from the
  * low-pressure centre. Ties together heating, pressure, wind, Coriolis,
- * fronts, clouds, and rain.
+ * fronts, clouds, terrain, and rain.
  *
  * Rendering layers (bottom to top):
  *  1. Temperature gradient background (N-S)
  *  2. Pressure colour field (80x80 offscreen canvas)
+ *  2b. Terrain field (80x80 offscreen canvas, hillshaded)
  *  3. Isobars (marching-squares contours)
  *  4. Fronts (cold: blue + triangle barbs, warm: red + semicircle bumps)
  *  5. Cloud puffs (~40 ellipses along fronts and near Low)
+ *  5b. Orographic clouds (windward slope puffs)
  *  6. Wind particles (550 streaks, speed -> brightness)
  *  7. Rain streaks (near Low when moisture > 0.5)
+ *  7b. Orographic rain (windward slope streaks)
  *  8. H/L labels at pressure centres
  *
  * Sliders: heating, moisture, rotation (Coriolis), speed (drift).
+ * Select: terrain type (none, coast, divide, island).
  */
 registerDemo('full-weather', {
   init(container) {
@@ -44,6 +48,17 @@ registerDemo('full-weather', {
     bindSlider(rotSlider,   v => { rotation = v; });
     bindSlider(speedSlider, v => { speed = v; });
 
+    // Terrain
+    let terrainType  = 'none';
+    let terrainDirty = true;
+    const terrainSelect = wrap.querySelector('[data-control="terrain-type"]');
+    if (terrainSelect) {
+      terrainSelect.addEventListener('change', () => {
+        terrainType  = terrainSelect.value;
+        terrainDirty = true;
+      });
+    }
+
     // --- Seeded RNG (stable cloud / rain positions) ---
     function seededRNG(seed) {
       let s = seed;
@@ -53,6 +68,48 @@ registerDemo('full-weather', {
       };
     }
     const rng = seededRNG(314159);
+
+    // --- Terrain height functions ---
+    function smoothstep(edge0, edge1, x) {
+      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    const terrainFns = {
+      none() { return 0; },
+      coast(x, y) {
+        // N-S ridge at x≈0.14
+        const ridge = Math.exp(-((x - 0.14) * (x - 0.14)) / (2 * 0.018 * 0.018));
+        // Taper at north/south edges
+        const taper = smoothstep(0.02, 0.15, y) * smoothstep(0.02, 0.15, 1 - y);
+        return ridge * taper;
+      },
+      divide(x, y) {
+        // N-S ridge at x≈0.50 with slight waviness
+        const wave = 0.50 + 0.03 * Math.sin(y * Math.PI * 4);
+        const ridge = Math.exp(-((x - wave) * (x - wave)) / (2 * 0.022 * 0.022));
+        const taper = smoothstep(0.02, 0.12, y) * smoothstep(0.02, 0.12, 1 - y);
+        return ridge * taper;
+      },
+      island(x, y) {
+        // Circular peak at (0.55, 0.55)
+        const dx = x - 0.55;
+        const dy = y - 0.55;
+        return Math.exp(-(dx * dx + dy * dy) / (2 * 0.045 * 0.045));
+      },
+    };
+
+    function terrainAt(x, y) {
+      return terrainFns[terrainType](x, y);
+    }
+
+    const T_EPS = 0.003;
+    function terrainGrad(x, y) {
+      return {
+        x: (terrainAt(x + T_EPS, y) - terrainAt(x - T_EPS, y)) / (2 * T_EPS),
+        y: (terrainAt(x, y + T_EPS) - terrainAt(x, y - T_EPS)) / (2 * T_EPS),
+      };
+    }
 
     // --- Pressure centres ---
     // Normalised coords [0,1]x[0,1]. y=0 is north (top), y=1 is south (bottom).
@@ -98,10 +155,10 @@ registerDemo('full-weather', {
       };
     }
 
-    // Wind at (x, y): blend of geostrophic and ageostrophic (friction) flow
+    // Raw (pressure-driven) wind — no terrain effects
     //   rotation=0 → wind straight H→L (pure PGF)
     //   rotation=1 → wind parallel to isobars (pure geostrophic)
-    function windAt(x, y) {
+    function rawWindAt(x, y) {
       const grad = pressureGrad(x, y);
       // Pressure gradient force
       const pgfX = -grad.x;
@@ -115,6 +172,22 @@ registerDemo('full-weather', {
       return {
         x: (r * geoX + (1 - r) * pgfX) * s,
         y: (r * geoY + (1 - r) * pgfY) * s,
+      };
+    }
+
+    // Wind with terrain effects: slowdown + deflection
+    function windAt(x, y) {
+      const w = rawWindAt(x, y);
+      if (terrainType === 'none') return w;
+      const h = terrainAt(x, y);
+      const tg = terrainGrad(x, y);
+      // Slowdown: speed × (1 − h × 0.85)
+      const slow = 1 - h * 0.85;
+      // Deflection: subtract gradient scaled by height
+      const deflect = h * 2.5;
+      return {
+        x: w.x * slow - tg.x * deflect,
+        y: w.y * slow - tg.y * deflect,
       };
     }
 
@@ -159,6 +232,61 @@ registerDemo('full-weather', {
       }
       fctx.putImageData(img, 0, 0);
       fieldDirty = false;
+    }
+
+    // --- Offscreen terrain field (same resolution) ---
+    const terrainCanvas = document.createElement('canvas');
+    terrainCanvas.width  = FIELD_RES;
+    terrainCanvas.height = FIELD_RES;
+
+    function renderTerrainField() {
+      const tctx = terrainCanvas.getContext('2d');
+      const img = tctx.createImageData(FIELD_RES, FIELD_RES);
+      const d = img.data;
+      for (let iy = 0; iy < FIELD_RES; iy++) {
+        for (let ix = 0; ix < FIELD_RES; ix++) {
+          const nx = (ix + 0.5) / FIELD_RES;
+          const ny = (iy + 0.5) / FIELD_RES;
+          const h = terrainAt(nx, ny);
+          if (h < 0.02) {
+            const pi = (iy * FIELD_RES + ix) * 4;
+            d[pi] = d[pi + 1] = d[pi + 2] = d[pi + 3] = 0;
+            continue;
+          }
+          // Hillshade from NW (light direction = (-1, -1) normalised)
+          const gx = (terrainAt(Math.min(1, nx + 0.01), ny) - terrainAt(Math.max(0, nx - 0.01), ny)) / 0.02;
+          const gy = (terrainAt(nx, Math.min(1, ny + 0.01)) - terrainAt(nx, Math.max(0, ny - 0.01))) / 0.02;
+          const shade = 0.5 + 0.5 * Math.max(-1, Math.min(1, (-gx - gy) * 0.7));
+          const base = 0.35 + 0.65 * shade;
+          // Brown tones
+          const r = Math.round(140 * base * h);
+          const g = Math.round(105 * base * h);
+          const b = Math.round(55 * base * h);
+          const a = Math.round(Math.min(1, h * 2.5) * 255);
+          const pi = (iy * FIELD_RES + ix) * 4;
+          d[pi]     = r;
+          d[pi + 1] = g;
+          d[pi + 2] = b;
+          d[pi + 3] = a;
+        }
+      }
+      tctx.putImageData(img, 0, 0);
+      terrainDirty = false;
+    }
+
+    // --- Orographic cloud / rain candidates (pre-generated) ---
+    const OROG_N = 200;
+    const orogCandidates = [];
+    for (let i = 0; i < OROG_N; i++) {
+      orogCandidates.push({
+        x: rng(),
+        y: rng(),
+        rx: 0.010 + rng() * 0.018,
+        ry: 0.006 + rng() * 0.012,
+        alpha: 0.04 + rng() * 0.06,
+        phase: rng(),
+        speed: 0.5 + rng() * 0.5,
+      });
     }
 
     // --- Marching squares isobars ---
@@ -398,6 +526,16 @@ registerDemo('full-weather', {
         p.wy = w.y;
         p.x += w.x * dt * 0.15;
         p.y += w.y * dt * 0.15;
+        // Push particles out of terrain peaks
+        if (terrainType !== 'none') {
+          const th = terrainAt(p.x, p.y);
+          if (th > 0.6) {
+            const tg = terrainGrad(p.x, p.y);
+            const pushStr = (th - 0.6) * 0.02;
+            p.x -= tg.x * pushStr;
+            p.y -= tg.y * pushStr;
+          }
+        }
       }
     }
 
@@ -436,6 +574,15 @@ registerDemo('full-weather', {
       ctx.drawImage(fieldCanvas, 0, 0, w, h);
       ctx.globalAlpha = 1;
 
+      // --- Layer 2b: Terrain ---
+      if (terrainType !== 'none') {
+        if (terrainDirty) renderTerrainField();
+        ctx.globalAlpha = 0.85;
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(terrainCanvas, 0, 0, w, h);
+        ctx.globalAlpha = 1;
+      }
+
       // --- Layer 3: Isobars ---
       drawIsobars(ctx, w, h);
 
@@ -457,6 +604,28 @@ registerDemo('full-weather', {
           ctx.beginPath();
           ctx.ellipse(cx, cy, c.rx * w, c.ry * h, 0, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(220,220,235,${(c.alpha * cloudAlpha).toFixed(3)})`;
+          ctx.fill();
+        }
+      }
+
+      // --- Layer 5b: Orographic clouds ---
+      if (terrainType !== 'none' && moistureVal > 0.05) {
+        for (const oc of orogCandidates) {
+          const th = terrainAt(oc.x, oc.y);
+          if (th < 0.08 || th > 0.65) continue;
+          const rw = rawWindAt(oc.x, oc.y);
+          const tg = terrainGrad(oc.x, oc.y);
+          // Dot product: positive = windward
+          const dot = rw.x * tg.x + rw.y * tg.y;
+          if (dot <= 0) continue;
+          const dotMag = Math.min(1, dot * 2);
+          const a = oc.alpha * moistureVal * th * dotMag;
+          if (a < 0.005) continue;
+          const cx = oc.x * w;
+          const cy = oc.y * h;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, oc.rx * w, oc.ry * h, 0, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(220,220,235,${a.toFixed(3)})`;
           ctx.fill();
         }
       }
@@ -506,6 +675,31 @@ registerDemo('full-weather', {
           const rx = (lowNx + r.offX) * w;
           const baseY = (lowNy + r.offY) * h;
           const yOff = ((time * r.speed + r.phase) % 1) * 12 * dpr;
+          ctx.beginPath();
+          ctx.moveTo(rx, baseY + yOff);
+          ctx.lineTo(rx + 0.3 * dpr, baseY + yOff + 6 * dpr);
+          ctx.stroke();
+        }
+      }
+
+      // --- Layer 7b: Orographic rain ---
+      if (terrainType !== 'none' && moistureVal > 0.3) {
+        const oRainAlpha = (moistureVal - 0.3) * 1.4;
+        ctx.lineWidth = 1 * dpr;
+        for (const oc of orogCandidates) {
+          const th = terrainAt(oc.x, oc.y);
+          if (th < 0.08 || th > 0.65) continue;
+          const rw = rawWindAt(oc.x, oc.y);
+          const tg = terrainGrad(oc.x, oc.y);
+          const dot = rw.x * tg.x + rw.y * tg.y;
+          if (dot <= 0) continue;
+          const dotMag = Math.min(1, dot * 2);
+          const a = oRainAlpha * th * dotMag * 0.35;
+          if (a < 0.01) continue;
+          ctx.strokeStyle = `rgba(180,200,240,${a.toFixed(3)})`;
+          const rx = oc.x * w;
+          const baseY = oc.y * h;
+          const yOff = ((time * oc.speed + oc.phase) % 1) * 12 * dpr;
           ctx.beginPath();
           ctx.moveTo(rx, baseY + yOff);
           ctx.lineTo(rx + 0.3 * dpr, baseY + yOff + 6 * dpr);
