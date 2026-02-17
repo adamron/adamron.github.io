@@ -1,0 +1,385 @@
+/* =============================================
+   Weather Systems — Article Styles
+   ============================================= */
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: #111;
+  color: #d4d4d4;
+  line-height: 1.75;
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(100, 150, 200, 0.3);
+  color: #fff;
+}
+
+/* --- Article Container --- */
+.article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+/* --- Header --- */
+.article-header {
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.back-link {
+  display: inline-block;
+  color: #666;
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #aaa;
+}
+
+.article-header h1 {
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #eee;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.article-header .subtitle {
+  font-size: 1.15rem;
+  color: #777;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* --- Section Navigation (Table of Contents) --- */
+.toc {
+  margin-bottom: 4rem;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.toc-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.toc ol {
+  list-style: none;
+  counter-reset: toc-counter;
+}
+
+.toc li {
+  counter-increment: toc-counter;
+  margin-bottom: 0.4rem;
+}
+
+.toc li::before {
+  content: counter(toc-counter) ".";
+  color: #555;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+  margin-right: 0.75rem;
+  display: inline-block;
+  width: 1.5rem;
+}
+
+.toc a {
+  color: #999;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.toc a:hover {
+  color: #ddd;
+}
+
+/* --- Typography --- */
+.section {
+  margin-bottom: 5rem;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: #eee;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.section h3 {
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: #ccc;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.section p {
+  margin-bottom: 1.25rem;
+  color: #bbb;
+}
+
+.section p:last-child {
+  margin-bottom: 0;
+}
+
+/* Emphasis and inline elements */
+.section strong {
+  color: #ddd;
+  font-weight: 600;
+}
+
+.section em {
+  color: #ccc;
+  font-style: italic;
+}
+
+.section code {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85em;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: #a0c0d8;
+}
+
+/* Key concept callouts */
+.key-idea {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid rgba(100, 150, 200, 0.5);
+  background: rgba(100, 150, 200, 0.05);
+  border-radius: 0 6px 6px 0;
+}
+
+.key-idea p {
+  color: #a0bcd0;
+  font-size: 0.95rem;
+}
+
+/* Math-like notation */
+.formula {
+  display: block;
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.95rem;
+  color: #90a8c0;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+}
+
+/* --- Interactive Demo Containers --- */
+.demo-container {
+  margin: 2.5rem -1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.demo-canvas-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-canvas-wrap.square {
+  aspect-ratio: 1 / 1;
+}
+
+.demo-canvas-wrap.short {
+  aspect-ratio: 3 / 1;
+}
+
+.demo-canvas-wrap canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Placeholder state before demos are implemented */
+.demo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #444;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+.demo-placeholder-icon {
+  font-size: 2rem;
+  opacity: 0.4;
+}
+
+.demo-placeholder-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Demo caption/description */
+.demo-caption {
+  padding: 0.75rem 1.25rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.8rem;
+  color: #555;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+/* Demo controls area (for sliders, buttons, etc.) */
+.demo-controls {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.demo-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-controls input[type="range"] {
+  width: 120px;
+  accent-color: #5a8aaa;
+}
+
+/* Side-by-side demo variant */
+.demo-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.demo-split .demo-canvas-wrap {
+  aspect-ratio: 1 / 1;
+}
+
+.demo-split .demo-canvas-wrap:first-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* --- Separator --- */
+.section-break {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 4rem 0;
+  border: none;
+}
+
+/* --- Footer --- */
+.article-footer {
+  margin-top: 5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.85rem;
+  color: #555;
+  text-align: center;
+}
+
+.article-footer a {
+  color: #777;
+  text-decoration: none;
+}
+
+.article-footer a:hover {
+  color: #aaa;
+}
+
+/* --- Responsive --- */
+@media (max-width: 760px) {
+  body {
+    font-size: 16px;
+  }
+
+  .article {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .article-header h1 {
+    font-size: 2rem;
+  }
+
+  .demo-container {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .demo-split {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-split .demo-canvas-wrap:first-child {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+@media (max-width: 480px) {
+  .article-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .section h2 {
+    font-size: 1.4rem;
+  }
+
+  .demo-controls {
+    flex-direction: column;
+  }
+}

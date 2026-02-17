@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>Weather Systems</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='10' cy='18' r='6' fill='%23778899'/><circle cx='16' cy='14' r='7' fill='%23889aab'/><circle cx='22' cy='18' r='6' fill='%23778899'/><circle cx='16' cy='18' r='7' fill='%23889aab'/></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<article class="article">
+
+  <!-- Header -->
+  <header class="article-header">
+    <a href="../../index.html" class="back-link">&larr; Adam's Tools</a>
+    <h1>Weather Systems</h1>
+    <p class="subtitle">
+      How the sun, the spin of the earth, and a thin shell of gas
+      conspire to create the weather we experience every day.
+    </p>
+  </header>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#heat">Heat & Temperature</a></li>
+      <li><a href="#pressure">Pressure & Density</a></li>
+      <li><a href="#wind">Wind</a></li>
+      <li><a href="#coriolis">The Coriolis Effect</a></li>
+      <li><a href="#convection">Convection</a></li>
+      <li><a href="#moisture">Moisture & Clouds</a></li>
+      <li><a href="#fronts">Air Masses & Fronts</a></li>
+      <li><a href="#storms">Storms</a></li>
+      <li><a href="#circulation">Global Circulation</a></li>
+      <li><a href="#putting-it-together">Putting It All Together</a></li>
+    </ol>
+  </nav>
+
+  <!-- ==========================================
+       Section 1: Heat & Temperature
+       ========================================== -->
+  <section class="section" id="heat">
+    <h2>Heat & Temperature</h2>
+
+    <p>
+      Everything in weather starts with heat. The sun bathes the earth in
+      radiation, but it doesn't heat the air directly — sunlight passes through
+      the atmosphere mostly unabsorbed. Instead, it heats the <em>ground</em>.
+      The ground, now warm, radiates infrared energy back upward, and
+      <em>that's</em> what heats the air from below.
+    </p>
+
+    <p>
+      This is why the hottest part of the day isn't noon — when the sun is
+      strongest — but a couple of hours later, after the ground has had time to
+      absorb energy and re-emit it into the air above. It's also why pavement
+      shimmers on a summer afternoon: you're seeing the heated air rising off
+      the surface.
+    </p>
+
+    <p>
+      As you move upward through the atmosphere, the air gets cooler. This
+      decrease is called the <strong>lapse rate</strong>, and in the lower
+      atmosphere (the troposphere, where all weather happens) it averages about
+      6.5 &deg;C per kilometer. The lapse rate isn't just a fun fact — it's the
+      foundation of atmospheric instability, and therefore of nearly all weather
+      phenomena.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="temperature-profile"
+           data-description="Vertical column showing temperature vs altitude with adjustable lapse rate">
+      </div>
+      <div class="demo-controls">
+        <label>Lapse rate <input type="range" min="0" max="100" value="65" data-control="lapse-rate"></label>
+        <label>Surface temp <input type="range" min="0" max="100" value="60" data-control="surface-temp"></label>
+      </div>
+      <div class="demo-caption">
+        Temperature decreases with altitude at the lapse rate. Adjust the
+        surface temperature and lapse rate to see how the profile changes.
+      </div>
+    </div>
+
+    <p>
+      Why does temperature drop with altitude? Because air pressure decreases
+      as you go up (there's less air above you pushing down). As air rises into
+      lower-pressure regions, it expands, and expansion cools a gas. This is
+      <strong>adiabatic cooling</strong> — no heat is added or removed; the
+      temperature changes purely because the volume changes.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        The sun heats the ground; the ground heats the air from below.
+        Temperature decreases with altitude at the lapse rate. This vertical
+        temperature structure is what drives all weather — it determines whether
+        air stays put or starts moving.
+      </p>
+    </div>
+
+    <p>
+      With this foundation — solar heating, the lapse rate, and adiabatic
+      processes — we can start to understand why air moves. And once air moves,
+      we have weather.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 2: Pressure & Density
+       ========================================== -->
+  <section class="section" id="pressure">
+    <h2>Pressure & Density</h2>
+
+    <p>
+      Air has weight. The entire column of atmosphere above you, stretching
+      up to the edge of space, presses down with a force of about 10 tonnes
+      per square meter. That's atmospheric pressure. At sea level it averages
+      1013 millibars (or hectopascals — the same number, different name).
+    </p>
+
+    <p>
+      Pressure decreases with altitude, roughly halving every 5.5 kilometers.
+      This isn't linear — it follows an exponential curve, because the air
+      at each level must support the weight of all the air above it, and there's
+      progressively less air to support.
+    </p>
+
+    <p>
+      Here's the critical link to temperature: warm air is less dense than cold
+      air. When you heat a parcel of air, its molecules move faster and spread
+      apart, lowering its density. This lighter air is buoyant — it rises,
+      like a hot-air balloon. Cold air, being denser, sinks.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="pressure-particles"
+           data-description="2D particle simulation showing warm particles rising and cold particles sinking">
+      </div>
+      <div class="demo-controls">
+        <label>Heat source <input type="range" min="0" max="100" value="60" data-control="heat"></label>
+      </div>
+      <div class="demo-caption">
+        Warm particles (red) are lighter and rise; cool particles (blue) are
+        denser and sink. Adjust the heat to see how temperature drives vertical motion.
+      </div>
+    </div>
+
+    <p>
+      This buoyancy mechanism is the engine that converts thermal energy into
+      kinetic energy — from heat to motion. When the sun heats the ground
+      unevenly (dark asphalt absorbs more than a grassy field; land heats
+      faster than water), it creates regions of warm, rising air and cool,
+      sinking air. These <strong>pressure differences</strong> are the direct
+      cause of wind.
+    </p>
+
+    <span class="formula">
+      &rho; = P / (R &times; T)
+    </span>
+
+    <p>
+      The ideal gas law relates pressure, density, and temperature. At constant
+      pressure, raising the temperature lowers the density. At constant
+      altitude, a warm column of air exerts less surface pressure than a cold
+      one, because its lower density means there's less mass in the column.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Warm air is less dense and rises; cold air is denser and sinks. This
+        simple relationship between temperature, density, and buoyancy is the
+        fundamental engine of all atmospheric motion.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 3: Wind
+       ========================================== -->
+  <section class="section" id="wind">
+    <h2>Wind</h2>
+
+    <p>
+      Wind is air moving from high pressure toward low pressure. That's it.
+      Every breeze, gale, and hurricane is ultimately driven by a
+      <strong>pressure gradient</strong> — a difference in pressure between
+      two locations.
+    </p>
+
+    <p>
+      Think of it like water on a tilted surface. The steeper the tilt, the
+      faster the water flows. In the atmosphere, the "tilt" is the pressure
+      gradient: the greater the difference in pressure over a given distance,
+      the stronger the wind. Meteorologists draw <strong>isobars</strong> —
+      lines of equal pressure on a map — and the wind blows roughly
+      perpendicular to them, from the high side to the low side.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="wind-field"
+           data-description="2D pressure map with animated wind vectors flowing from high to low pressure">
+      </div>
+      <div class="demo-controls">
+        <label>H pressure <input type="range" min="0" max="100" value="80" data-control="high-pressure"></label>
+        <label>L pressure <input type="range" min="0" max="100" value="20" data-control="low-pressure"></label>
+      </div>
+      <div class="demo-caption">
+        Wind vectors flow from the high-pressure region (H) to the low-pressure
+        region (L). Increase the difference to strengthen the wind.
+      </div>
+    </div>
+
+    <p>
+      On a local scale, you can feel this every day. The sea breeze that picks
+      up on a summer afternoon happens because land heats faster than water.
+      The air over the land warms, rises, and creates a low-pressure zone. The
+      cooler, higher-pressure air over the ocean rushes in to fill the gap —
+      that's your sea breeze. At night, the pattern reverses.
+    </p>
+
+    <span class="formula">
+      F = &minus;&nabla;P / &rho;
+    </span>
+
+    <p>
+      The pressure gradient force (the negative gradient of pressure divided by
+      density) is the force that accelerates air from high pressure to low. If
+      this were the only force acting, wind would blow straight across isobars.
+      But the earth is rotating, and that introduces a complication that changes
+      everything about how wind patterns look on a large scale.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Wind is driven by pressure gradients. Air accelerates from high-pressure
+        regions toward low-pressure regions. The stronger the gradient, the
+        stronger the wind.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 4: The Coriolis Effect
+       ========================================== -->
+  <section class="section" id="coriolis">
+    <h2>The Coriolis Effect</h2>
+
+    <p>
+      If the earth didn't rotate, wind would blow in straight lines from high
+      pressure to low. But the earth does rotate, and this rotation deflects
+      moving air in a way that is subtle, counter-intuitive, and profoundly
+      important.
+    </p>
+
+    <p>
+      The deflection is called the <strong>Coriolis effect</strong>. In the
+      northern hemisphere, moving air is deflected to the <em>right</em> of
+      its direction of travel. In the southern hemisphere, it's deflected to
+      the <em>left</em>. The effect is zero at the equator and strongest at
+      the poles.
+    </p>
+
+    <p>
+      Why does this happen? Because the earth's surface moves at different
+      speeds at different latitudes. At the equator, a point on the surface is
+      racing eastward at about 1,670 km/h. At 60&deg; latitude, that speed is
+      only half as much. When air moves from the equator toward the poles, it
+      carries its eastward momentum with it — but the ground beneath it is
+      moving slower, so the air appears to curve eastward (to the right in
+      the northern hemisphere).
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-split">
+        <div class="demo-canvas-wrap"
+             data-demo="coriolis-straight"
+             data-description="Path of moving air without rotation — straight from H to L">
+        </div>
+        <div class="demo-canvas-wrap"
+             data-demo="coriolis-deflected"
+             data-description="Same path on a rotating earth — deflected to the right (northern hemisphere)">
+        </div>
+      </div>
+      <div class="demo-controls">
+        <label>Rotation speed <input type="range" min="0" max="100" value="50" data-control="rotation"></label>
+        <label>Latitude <input type="range" min="0" max="90" value="45" data-control="latitude"></label>
+      </div>
+      <div class="demo-caption">
+        Left: straight path in a non-rotating frame. Right: the same motion
+        seen from the rotating earth's surface. The Coriolis deflection curves
+        the path to the right in the northern hemisphere.
+      </div>
+    </div>
+
+    <p>
+      The Coriolis effect doesn't create wind — pressure gradients do that.
+      But it shapes how wind flows around pressure systems. Instead of rushing
+      straight into a low-pressure center, air spirals around it. In the
+      northern hemisphere, air flows counter-clockwise around lows
+      (<strong>cyclones</strong>) and clockwise around highs
+      (<strong>anticyclones</strong>). The southern hemisphere reverses both.
+    </p>
+
+    <p>
+      At large scales, the Coriolis effect also creates a balance with the
+      pressure gradient force. When these two forces are equal, wind flows
+      parallel to the isobars instead of across them. This is called
+      <strong>geostrophic balance</strong>, and it explains why upper-level
+      winds tend to follow the contours of pressure systems rather than
+      cutting across them.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Earth's rotation deflects moving air — to the right in the northern
+        hemisphere, to the left in the southern. This creates the spiral wind
+        patterns around pressure systems and is essential for understanding
+        large-scale weather.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 5: Convection
+       ========================================== -->
+  <section class="section" id="convection">
+    <h2>Convection</h2>
+
+    <p>
+      When the ground heats air from below, that air becomes buoyant and rises.
+      As it rises, it cools (adiabatic cooling). Eventually it reaches a height
+      where it's no longer warmer than the surrounding air, and it stops rising.
+      It then spreads horizontally, cools further, and sinks back down. This
+      circular flow is a <strong>convection cell</strong>.
+    </p>
+
+    <p>
+      You see convection everywhere. The shimmer above a hot road. The rolling
+      boil in a pot of water. Cumulus clouds forming in neat rows on a summer
+      afternoon — each cloud marks the top of a convection cell where rising
+      air has cooled enough for moisture to condense.
+    </p>
+
+    <p>
+      The strength of convection depends on how quickly temperature decreases
+      with altitude — the <strong>environmental lapse rate</strong>. If the
+      actual lapse rate is steeper than the adiabatic lapse rate (about
+      10 &deg;C/km for dry air), then a rising parcel stays warmer than its
+      surroundings and keeps accelerating upward. This is an
+      <strong>unstable</strong> atmosphere, and it produces vigorous convection.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="convection-cells"
+           data-description="2D convection simulation with particles showing temperature-driven circulation cells">
+      </div>
+      <div class="demo-controls">
+        <label>Surface heating <input type="range" min="0" max="100" value="60" data-control="heating"></label>
+        <label>Stability <input type="range" min="0" max="100" value="50" data-control="stability"></label>
+      </div>
+      <div class="demo-caption">
+        Warm air rises in the center of each cell, cools and spreads at the
+        top, then sinks at the edges. Color indicates temperature.
+      </div>
+    </div>
+
+    <p>
+      If the lapse rate is shallower (the atmosphere cools slowly with height),
+      a rising parcel quickly becomes colder than its surroundings and sinks
+      back. This is a <strong>stable</strong> atmosphere — it resists vertical
+      motion and tends to produce calm, clear conditions.
+    </p>
+
+    <span class="formula">
+      unstable: environmental lapse rate > adiabatic lapse rate
+    </span>
+
+    <p>
+      Convection is the mechanism that transports heat upward from the surface
+      into the atmosphere. Without it, the surface would overheat and the upper
+      air would be far too cold. It is also the engine behind thunderstorms,
+      which are essentially convection cells that have grown explosively large.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Convection cells form when heated air rises, cools, spreads, and sinks.
+        Atmospheric stability — determined by the lapse rate — controls whether
+        convection is gentle or explosive. Convection is the engine of weather.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 6: Moisture & Clouds
+       ========================================== -->
+  <section class="section" id="moisture">
+    <h2>Moisture & Clouds</h2>
+
+    <p>
+      The atmosphere carries water in its invisible form: vapor. Water
+      evaporates from oceans, lakes, rivers, and soil, mixing into the air. The
+      amount of vapor air can hold depends on temperature — warm air holds
+      dramatically more than cold air. At 30 &deg;C, a cubic meter of air can
+      hold about 30 grams of water vapor. At 0 &deg;C, only about 5 grams.
+    </p>
+
+    <p>
+      <strong>Relative humidity</strong> measures how close the air is to its
+      capacity. At 100% relative humidity, the air is saturated — it's holding
+      all the vapor it can. The temperature at which a given parcel of air
+      reaches saturation is called the <strong>dew point</strong>.
+    </p>
+
+    <p>
+      This is where convection and moisture intersect. As air rises and cools
+      adiabatically, its capacity to hold vapor drops. Eventually the
+      temperature falls to the dew point, the air becomes saturated, and water
+      vapor <strong>condenses</strong> into tiny droplets — forming a cloud.
+      The altitude where this happens is the <strong>cloud base</strong>, and
+      you can estimate it from the temperature and dew point at the surface.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="cloud-formation"
+           data-description="Rising air parcel showing temperature and dew point converging at cloud base">
+      </div>
+      <div class="demo-controls">
+        <label>Surface temp <input type="range" min="0" max="100" value="65" data-control="temperature"></label>
+        <label>Dew point <input type="range" min="0" max="100" value="45" data-control="dew-point"></label>
+      </div>
+      <div class="demo-caption">
+        A rising air parcel cools at the dry adiabatic rate until the
+        temperature meets the dew point. That's where the cloud forms.
+      </div>
+    </div>
+
+    <p>
+      Condensation also releases <strong>latent heat</strong>. When water
+      evaporated at the surface, it absorbed energy. Now, as it condenses
+      back into liquid, it returns that energy to the air as heat. This is
+      hugely important: latent heat release warms the rising air, making it
+      more buoyant, which makes it rise faster, which causes more condensation,
+      which releases more heat. It's a positive feedback loop — and it's
+      what turns ordinary convection into towering cumulonimbus clouds and
+      thunderstorms.
+    </p>
+
+    <span class="formula">
+      cloud base &asymp; 125 &times; (T<sub>surface</sub> &minus; T<sub>dew point</sub>) meters
+    </span>
+
+    <p>
+      Above the cloud base, the rising air is now saturated, and it cools more
+      slowly — at the <strong>moist adiabatic lapse rate</strong> (about
+      5&ndash;6 &deg;C/km instead of 10), because the latent heat of
+      condensation partially offsets the cooling from expansion. This is why
+      the tallest clouds — cumulonimbus — can punch through the troposphere
+      into the stratosphere: the moisture keeps feeding them energy.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Clouds form when rising air cools to the dew point. The condensation
+        releases latent heat, which fuels further rising — a positive feedback
+        loop that powers the most dramatic weather phenomena.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 7: Air Masses & Fronts
+       ========================================== -->
+  <section class="section" id="fronts">
+    <h2>Air Masses & Fronts</h2>
+
+    <p>
+      An <strong>air mass</strong> is a large body of air — sometimes thousands
+      of kilometers across — with roughly uniform temperature and humidity.
+      Air masses form when air sits over a region long enough to take on its
+      characteristics. Air over the tropical ocean becomes warm and moist.
+      Air over the arctic becomes cold and dry.
+    </p>
+
+    <p>
+      Weather happens when different air masses collide. Because they have
+      different densities (warm air is lighter, cold air is heavier), they
+      don't mix easily. Instead, one slides over or under the other, creating
+      a boundary called a <strong>front</strong>.
+    </p>
+
+    <h3>Cold fronts</h3>
+
+    <p>
+      When a cold air mass advances on a warm one, the dense cold air acts like
+      a wedge, pushing under the warm air and forcing it rapidly upward. This
+      violent lifting produces a narrow band of intense weather — tall
+      cumulonimbus clouds, heavy rain or hail, sometimes severe thunderstorms.
+      Cold fronts move fast and the weather they bring, while dramatic, passes
+      quickly.
+    </p>
+
+    <h3>Warm fronts</h3>
+
+    <p>
+      When warm air advances on a cold mass, it can't shove the cold air out
+      of the way — cold air is too dense. Instead, the warm air rides up and
+      over the cold air along a gentle slope. This produces a wide area of
+      gradual lifting, creating layered clouds (stratus, altostratus,
+      cirrostratus) and prolonged, steady precipitation. Warm fronts move
+      slowly and the associated weather can last for days.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="fronts"
+           data-description="Animated cross-section showing cold and warm front dynamics">
+      </div>
+      <div class="demo-controls">
+        <label>Front type <input type="range" min="0" max="1" value="0" data-control="front-type"></label>
+        <label>Speed <input type="range" min="0" max="100" value="50" data-control="speed"></label>
+      </div>
+      <div class="demo-caption">
+        Cross-section view of a front. Toggle between cold front (dense air
+        wedging under) and warm front (warm air riding over).
+      </div>
+    </div>
+
+    <p>
+      Fronts are where much of the mid-latitude weather action happens. The
+      boundary between a tropical and a polar air mass is where you find the
+      strongest temperature gradients, the most vigorous lifting, and the
+      stormiest conditions. This boundary zone — the <strong>polar
+      front</strong> — meanders around the globe and is intimately connected
+      to the jet stream.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Air masses are large regions of uniform temperature and humidity. When
+        they collide, the boundary — a front — forces air upward and produces
+        weather. Cold fronts are steep and violent; warm fronts are gentle
+        and prolonged.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 8: Storms
+       ========================================== -->
+  <section class="section" id="storms">
+    <h2>Storms</h2>
+
+    <p>
+      A thunderstorm is convection that has gone into overdrive. The recipe
+      requires three ingredients: <strong>instability</strong> (a steep lapse
+      rate so that rising air keeps accelerating), <strong>moisture</strong>
+      (fuel for latent heat release), and <strong>lift</strong> (something to
+      get the air moving upward in the first place — a front, a mountain, or
+      strong surface heating).
+    </p>
+
+    <p>
+      In the <strong>developing stage</strong>, a powerful updraft dominates.
+      Warm, moist air surges upward, sometimes at speeds exceeding 30 m/s.
+      As it rises, moisture condenses and the cloud grows explosively —
+      a cumulus tower can reach 12 km in altitude in 20 minutes. The
+      condensation releases enormous amounts of latent heat, which drives the
+      updraft even harder.
+    </p>
+
+    <p>
+      The <strong>mature stage</strong> begins when the accumulated water
+      becomes too heavy for the updraft to support. Rain and hail begin
+      falling, dragging air downward and creating a <strong>downdraft</strong>
+      alongside the updraft. This stage produces the most intense weather:
+      heavy rain, lightning, strong winds, and sometimes hail or tornadoes.
+      The storm is now a heat engine, extracting energy from warm, moist
+      air and converting it into kinetic energy and precipitation.
+    </p>
+
+    <p>
+      In the <strong>dissipating stage</strong>, the downdraft spreads along
+      the surface and cuts off the inflow of warm air that was feeding the
+      updraft. Starved of fuel, the storm weakens and decays, leaving behind
+      a spread of high cirrus clouds — the anvil — as the only reminder.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="storm-cell"
+           data-description="Animated thunderstorm cross-section showing updraft, downdraft, and precipitation">
+      </div>
+      <div class="demo-controls">
+        <label>Instability <input type="range" min="0" max="100" value="60" data-control="instability"></label>
+        <label>Moisture <input type="range" min="0" max="100" value="60" data-control="moisture"></label>
+        <label>Wind shear <input type="range" min="0" max="100" value="30" data-control="shear"></label>
+      </div>
+      <div class="demo-caption">
+        A thunderstorm cell progresses through its life cycle. Updraft (red
+        arrows), downdraft (blue arrows), and rain. Wind shear tilts the
+        storm, separating updraft and downdraft to extend its life.
+      </div>
+    </div>
+
+    <p>
+      A crucial modifier is <strong>wind shear</strong> — the change in wind
+      speed or direction with altitude. Without shear, the downdraft falls
+      right on top of the updraft and kills the storm within 30 minutes. With
+      shear, the storm tilts: the updraft and downdraft become separated, and
+      the storm can sustain itself for hours. The most violent storms —
+      <strong>supercells</strong> — exist in environments with strong shear
+      and extreme instability. Their rotating updrafts can produce tornadoes.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Storms require instability, moisture, and lift. The updraft drives
+        condensation and latent heat release; the downdraft brings rain and
+        spreads cold air. Wind shear determines whether a storm dies quickly
+        or organizes into a long-lived, severe system.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 9: Global Circulation
+       ========================================== -->
+  <section class="section" id="circulation">
+    <h2>Global Circulation</h2>
+
+    <p>
+      Zoom out from individual storms to the whole planet, and a grand pattern
+      emerges. The equator receives far more solar energy than the poles. This
+      creates a massive temperature gradient from equator to pole, and the
+      atmosphere's primary job is to transport heat poleward to reduce that
+      imbalance.
+    </p>
+
+    <p>
+      If the earth didn't rotate, you'd get a single, simple convection cell
+      in each hemisphere: air would rise at the equator, flow poleward at
+      altitude, sink at the pole, and return along the surface. But the
+      Coriolis effect breaks this single cell into three distinct cells per
+      hemisphere.
+    </p>
+
+    <h3>The Hadley cell</h3>
+
+    <p>
+      Nearest the equator, intense heating drives air upward in a band of
+      thunderstorms called the <strong>Intertropical Convergence Zone</strong>
+      (ITCZ). This air flows poleward at altitude, but the Coriolis effect
+      deflects it eastward. By about 30&deg; latitude, it has been deflected
+      so much that it piles up and sinks. This sinking air creates the
+      <strong>subtropical highs</strong> — persistent high-pressure belts
+      that produce the world's great deserts (Sahara, Arabian, Sonoran). The
+      surface return flow, deflected westward by Coriolis, creates the
+      <strong>trade winds</strong>.
+    </p>
+
+    <h3>The Ferrel cell</h3>
+
+    <p>
+      Between 30&deg; and 60&deg; latitude, the circulation is indirect —
+      driven by the cells on either side rather than by direct thermal forcing.
+      Surface winds in this belt are deflected eastward by Coriolis, creating
+      the <strong>westerlies</strong>. This is why weather systems in the
+      mid-latitudes generally move from west to east.
+    </p>
+
+    <h3>The Polar cell</h3>
+
+    <p>
+      Cold air sinks at the poles, flows toward mid-latitudes at the surface
+      (deflected westward, creating the <strong>polar easterlies</strong>),
+      rises at around 60&deg; where it meets the warmer Ferrel cell air, and
+      returns poleward aloft.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="global-circulation"
+           data-description="Hemisphere cross-section showing Hadley, Ferrel, and Polar circulation cells with surface winds">
+      </div>
+      <div class="demo-controls">
+        <label>Rotation rate <input type="range" min="0" max="100" value="50" data-control="rotation"></label>
+        <label>Solar heating <input type="range" min="0" max="100" value="70" data-control="heating"></label>
+      </div>
+      <div class="demo-caption">
+        Cross-section from equator to pole showing the three circulation cells.
+        Surface winds are labeled. Adjust rotation to see how the Coriolis
+        effect shapes the cells.
+      </div>
+    </div>
+
+    <p>
+      At the boundaries between cells — particularly at around 60&deg;, where
+      polar and tropical air collide — the temperature gradient is steep and
+      the <strong>jet stream</strong> forms. This ribbon of fast-moving air
+      at about 10 km altitude (250+ km/h) steers weather systems and marks
+      the polar front. When the jet stream dips southward, it pulls cold air
+      with it; when it bulges northward, it allows warm air to push poleward.
+      These meanders are the direct cause of the week-to-week weather
+      variability in temperate regions.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Global circulation distributes heat from the equator to the poles
+        through three cells per hemisphere: Hadley, Ferrel, and Polar. The
+        Coriolis effect shapes these cells and creates the trade winds,
+        westerlies, and jet streams that govern weather patterns.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 10: Putting It All Together
+       ========================================== -->
+  <section class="section" id="putting-it-together">
+    <h2>Putting It All Together</h2>
+
+    <p>
+      Each concept we've explored — heating, pressure, wind, Coriolis
+      deflection, convection, moisture, fronts, storms, and global
+      circulation — is a piece of the puzzle. On their own, they explain
+      isolated phenomena. Combined, they produce the full complexity of
+      weather.
+    </p>
+
+    <p>
+      The chain of causation runs like this:
+    </p>
+
+    <p>
+      <strong>1. Differential heating</strong> — The sun heats the earth's
+      surface unevenly. Land and water, equator and poles, day and night
+      all create temperature contrasts.
+    </p>
+
+    <p>
+      <strong>2. Pressure gradients form</strong> — Temperature differences
+      create density differences, which produce pressure differences at the
+      surface and aloft.
+    </p>
+
+    <p>
+      <strong>3. Air moves</strong> — Wind flows from high pressure to low,
+      shaped by the Coriolis effect into spiraling patterns around pressure
+      centers.
+    </p>
+
+    <p>
+      <strong>4. Moisture enters the picture</strong> — As air flows over
+      water and warm surfaces, it picks up moisture. When forced upward — by
+      convection, fronts, or terrain — the air cools, vapor condenses, clouds
+      form, and latent heat is released.
+    </p>
+
+    <p>
+      <strong>5. Storms develop</strong> — Where instability, moisture, and
+      lifting converge, convection intensifies into storms. Latent heat
+      release amplifies the process.
+    </p>
+
+    <p>
+      <strong>6. The global machine</strong> — All of this is organized by the
+      planet's rotation into the great circulation cells, jet streams, and
+      migrating pressure systems that define climate zones and steer daily
+      weather.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="full-weather"
+           data-description="Interactive weather map combining temperature, pressure, wind, clouds, and precipitation"
+           style="aspect-ratio: 16 / 9;">
+      </div>
+      <div class="demo-controls">
+        <label>Solar heating <input type="range" min="0" max="100" value="60" data-control="heating"></label>
+        <label>Moisture <input type="range" min="0" max="100" value="50" data-control="moisture"></label>
+        <label>Rotation <input type="range" min="0" max="100" value="50" data-control="rotation"></label>
+        <label>Speed <input type="range" min="0" max="100" value="50" data-control="speed"></label>
+      </div>
+      <div class="demo-caption">
+        A 2D weather simulation combining all the systems. Temperature (color),
+        pressure (contours), wind (vectors), and clouds (white). Adjust
+        parameters to explore how the systems interact.
+      </div>
+    </div>
+
+    <p>
+      What's remarkable is how few fundamental principles underlie all of this.
+      The gas laws. Gravity. The conservation of energy and momentum. The
+      rotation of the earth. From these simple rules, the full spectrum of
+      weather emerges — from a gentle morning breeze to a category-5 hurricane.
+    </p>
+
+    <p>
+      Modern weather forecasting works by encoding these principles into
+      systems of differential equations and solving them numerically on
+      supercomputers, starting from measured initial conditions. The fact that
+      we can predict the weather five to seven days out is a testament to how
+      well we understand these underlying systems. And the fact that we
+      can't reliably predict beyond two weeks is a testament to how
+      exquisitely sensitive the atmosphere is to small perturbations — the
+      deterministic chaos that Edward Lorenz discovered while studying these
+      very equations.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="article-footer">
+    <p>
+      <a href="../../index.html">&larr; Back to Adam's Tools</a>
+    </p>
+  </footer>
+
+</article>
+
+<!-- Scripts: app.js defines the registry, then init runs -->
+<script src="js/app.js"></script>
+<script src="js/temperature-profile.js"></script>
+<script src="js/pressure-particles.js"></script>
+<script src="js/wind-field.js"></script>
+<script src="js/coriolis.js"></script>
+<script src="js/convection-cells.js"></script>
+<script src="js/cloud-formation.js"></script>
+<script src="js/fronts.js"></script>
+<script src="js/storm-cell.js"></script>
+<script src="js/global-circulation.js"></script>
+<script src="js/full-weather.js"></script>
+<script>initAll();</script>
+
+</body>
+</html>

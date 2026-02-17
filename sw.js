@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v6';
+const CACHE_NAME = 'tools-v7';
 const ASSETS = [
   '/',
   '/index.html',
@@ -97,7 +97,20 @@ const ASSETS = [
   '/tools/terrain/js/shaping.js',
   '/tools/terrain/js/colored-terrain.js',
   '/tools/terrain/js/erosion.js',
-  '/tools/terrain/js/full-terrain.js'
+  '/tools/terrain/js/full-terrain.js',
+  '/tools/weather/index.html',
+  '/tools/weather/css/styles.css',
+  '/tools/weather/js/app.js',
+  '/tools/weather/js/temperature-profile.js',
+  '/tools/weather/js/pressure-particles.js',
+  '/tools/weather/js/wind-field.js',
+  '/tools/weather/js/coriolis.js',
+  '/tools/weather/js/convection-cells.js',
+  '/tools/weather/js/cloud-formation.js',
+  '/tools/weather/js/fronts.js',
+  '/tools/weather/js/storm-cell.js',
+  '/tools/weather/js/global-circulation.js',
+  '/tools/weather/js/full-weather.js'
 ];
 
 self.addEventListener('install', event => {
