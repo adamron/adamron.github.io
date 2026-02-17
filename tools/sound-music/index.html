@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>Sound & Music</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🎵</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<article class="article">
+
+  <!-- Header -->
+  <header class="article-header">
+    <a href="../../index.html" class="back-link">&larr; Adam's Tools</a>
+    <h1>Sound &amp; Music</h1>
+    <p class="subtitle">
+      How pressure waves become musical scales — the physics, mathematics,
+      and perception behind the notes we play.
+    </p>
+  </header>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#what-is-sound">What Is Sound?</a></li>
+      <li><a href="#anatomy">Anatomy of a Wave</a></li>
+      <li><a href="#pitch">Pitch and Perception</a></li>
+      <li><a href="#waveforms">Waveforms</a></li>
+      <li><a href="#harmonics">Harmonics and Timbre</a></li>
+      <li><a href="#octave">The Octave</a></li>
+      <li><a href="#consonance">Consonance and Simple Ratios</a></li>
+      <li><a href="#twelve-tones">Why Twelve Notes?</a></li>
+      <li><a href="#scales">Scales and the Keyboard</a></li>
+      <li><a href="#seeing-sound">Seeing and Building Sound</a></li>
+    </ol>
+  </nav>
+
+  <!-- ==========================================
+       Section 1: What Is Sound?
+       ========================================== -->
+  <section class="section" id="what-is-sound">
+    <h2>What Is Sound?</h2>
+
+    <p>
+      Drop a pebble into still water and ripples spread outward. Sound works the
+      same way, except the medium is air (or any material) and the ripples are
+      invisible fluctuations in pressure.
+    </p>
+
+    <p>
+      When a guitar string vibrates, it pushes the air molecules next to it
+      closer together — a region of <strong>compression</strong>. As the string
+      swings back, it leaves behind a region of lower pressure —
+      <strong>rarefaction</strong>. These alternating zones of high and low
+      pressure propagate outward through the air as a <strong>longitudinal
+      wave</strong>. The molecules themselves don't travel from the guitar to
+      your ear; they just jostle back and forth, passing the pattern along like
+      a crowd doing the wave in a stadium.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="pressure-wave"
+           data-description="Animated 1D particle compression wave showing regions of compression and rarefaction">
+      </div>
+      <div class="demo-caption">
+        Watch the pressure pattern propagate. The individual particles oscillate
+        in place — only the wave moves forward.
+      </div>
+    </div>
+
+    <p>
+      The speed of this wave depends on the medium. In air at room temperature,
+      sound travels at about <strong>343 meters per second</strong> (roughly
+      767 mph). In water, it's about 1,480 m/s. In steel, over 5,000 m/s. The
+      denser and stiffer the material, the faster the wave propagates.
+    </p>
+
+    <p>
+      In a vacuum, there's nothing to compress and nothing to carry the
+      pattern. Sound requires a medium — which is why, despite what Hollywood
+      suggests, explosions in space are silent.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Sound is a pattern of pressure traveling through a medium, not matter
+        moving through space. It's a wave of information, not a wave of stuff.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 2: Anatomy of a Wave
+       ========================================== -->
+  <section class="section" id="anatomy">
+    <h2>Anatomy of a Wave</h2>
+
+    <p>
+      To talk precisely about sound, we need a vocabulary for describing waves.
+      The simplest wave is a <strong>sine wave</strong> — a smooth, endlessly
+      repeating oscillation. It's the building block from which all other sounds
+      can be constructed.
+    </p>
+
+    <p>
+      A sine wave is described by a handful of properties:
+    </p>
+
+    <p>
+      <strong>Frequency</strong> is how many complete cycles the wave completes
+      per second, measured in <strong>hertz (Hz)</strong>. A wave that completes
+      440 cycles per second has a frequency of 440 Hz — this happens to be the
+      note A above middle C, the standard tuning reference.
+    </p>
+
+    <p>
+      <strong>Amplitude</strong> is the height of the wave — how far the
+      pressure swings above and below the resting level. Larger amplitude means
+      louder sound.
+    </p>
+
+    <p>
+      <strong>Wavelength</strong> (<code>&lambda;</code>) is the physical
+      distance between two identical points on consecutive cycles — from peak to
+      peak, or trough to trough. Wavelength and frequency are inversely related:
+      as frequency goes up, wavelength shrinks.
+    </p>
+
+    <p>
+      <strong>Period</strong> is the time for one complete cycle — the inverse of
+      frequency.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="wave-anatomy"
+           data-description="Labeled sine wave with adjustable frequency and amplitude — showing wavelength, period, and amplitude markers">
+      </div>
+      <div class="demo-controls">
+        <label>Frequency <input type="range" min="1" max="20" value="4" data-control="frequency"></label>
+        <label>Amplitude <input type="range" min="10" max="100" value="70" data-control="amplitude"></label>
+      </div>
+      <div class="demo-caption">
+        A pure sine wave with its key measurements labeled. Adjust frequency and
+        amplitude to see how the wave changes shape.
+      </div>
+    </div>
+
+    <span class="formula">
+      f = v / &lambda; &nbsp;&nbsp;&nbsp;&nbsp; period T = 1 / f
+    </span>
+
+    <p>
+      These relationships are fundamental. If you know the speed of sound in
+      air (343 m/s) and the frequency of a note (say 440 Hz), you can calculate
+      the wavelength: <code>343 / 440 &asymp; 0.78 meters</code>. Concert A has
+      a wavelength of about 78 centimeters — roughly the length of your arm.
+    </p>
+
+    <p>
+      <strong>Phase</strong> describes where in its cycle a wave starts. Two
+      waves with the same frequency and amplitude but different phases are
+      offset in time. Phase matters enormously when waves interact — when two
+      identical waves are perfectly in phase they reinforce each other, and when
+      they're half a cycle out of phase they cancel.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 3: Pitch and Perception
+       ========================================== -->
+  <section class="section" id="pitch">
+    <h2>Pitch and Perception</h2>
+
+    <p>
+      Frequency is a physical measurement. <strong>Pitch</strong> is the
+      psychological experience — how high or low a sound seems to us. The two
+      are closely related, but the mapping is not straightforward.
+    </p>
+
+    <p>
+      Humans can hear frequencies from roughly <strong>20 Hz</strong> (a deep,
+      rumbling bass) to about <strong>20,000 Hz</strong> (a piercing, barely
+      audible whine). This range spans about 10 octaves. Most music lives in the
+      middle — the piano covers roughly 27.5 Hz (A0) to 4,186 Hz (C8).
+    </p>
+
+    <p>
+      The crucial insight is that our perception of pitch is
+      <strong>logarithmic</strong>, not linear. Going from 100 Hz to 200 Hz
+      sounds like the same "step up" as going from 1,000 Hz to 2,000 Hz — even
+      though the second jump is ten times larger in absolute terms. What matters
+      is the <em>ratio</em>. In both cases, the frequency doubled, and a
+      doubling of frequency corresponds to one <strong>octave</strong>.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="pitch-frequency"
+           data-description="Tone generator with frequency slider and note name display — hear how pitch changes with frequency">
+      </div>
+      <div class="demo-controls">
+        <label>Frequency <input type="range" min="60" max="2000" value="440" data-control="frequency"></label>
+      </div>
+      <div class="demo-caption">
+        Drag the slider to change the frequency. Notice how equal distances on
+        the slider don't sound like equal pitch steps — perception is logarithmic.
+      </div>
+    </div>
+
+    <p>
+      This logarithmic hearing isn't arbitrary — it's deeply useful. It means we
+      can perceive fine distinctions among the low frequencies that dominate in
+      nature (animal calls, thunder, flowing water) while still being sensitive
+      to the high frequencies that carry detail (consonants in speech, rustling
+      leaves).
+    </p>
+
+    <p>
+      The standard tuning reference is <strong>concert A = 440 Hz</strong>,
+      adopted internationally in 1955. All other note frequencies in the modern
+      system are defined relative to this anchor point.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Our perception of pitch is logarithmic. Each octave is a doubling of
+        frequency, yet sounds like an equal step up. This single fact shapes
+        the entire structure of music.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 4: Waveforms
+       ========================================== -->
+  <section class="section" id="waveforms">
+    <h2>Waveforms</h2>
+
+    <p>
+      A sine wave is the purest sound — a single frequency with no complexity.
+      But almost nothing in the real world produces a pure sine. When you pluck
+      a string, blow into a flute, or speak a vowel, the sound wave has a
+      distinctive shape that's far more complex. The shape of the wave — its
+      <strong>waveform</strong> — determines its sonic character.
+    </p>
+
+    <p>
+      Four classic waveforms appear constantly in synthesis and audio:
+    </p>
+
+    <p>
+      <strong>Sine</strong> — smooth and pure. Contains only the fundamental
+      frequency. Sounds hollow, clean, almost electronic. This is the "atom"
+      of sound.
+    </p>
+
+    <p>
+      <strong>Square</strong> — alternates abruptly between two levels. Sounds
+      hollow and buzzy, like a vintage video game. Contains only odd harmonics
+      (3rd, 5th, 7th...) with amplitudes that fall off as 1/n.
+    </p>
+
+    <p>
+      <strong>Triangle</strong> — a softer, rounded version of the square wave.
+      Also contains only odd harmonics, but they fall off much faster (as
+      1/n&sup2;), giving it a mellower tone.
+    </p>
+
+    <p>
+      <strong>Sawtooth</strong> — ramps up linearly then drops sharply. The
+      richest of the four — it contains <em>all</em> harmonics, both odd and
+      even, with amplitudes falling off as 1/n. Sounds bright and buzzy. This
+      is the starting point for many synthesizer patches.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="waveform-shapes"
+           data-description="Four waveforms side by side — sine, square, triangle, sawtooth — with audio toggle for each">
+      </div>
+      <div class="demo-caption">
+        The four fundamental waveforms. Each has a distinctive visual shape and
+        a distinctive sound, determined by its harmonic content.
+      </div>
+    </div>
+
+    <p>
+      The key insight here is one of the most beautiful results in mathematics:
+      <strong>any</strong> periodic waveform, no matter how complex, can be
+      decomposed into a sum of sine waves at different frequencies and
+      amplitudes. This is <strong>Fourier's theorem</strong>, and it means that
+      the difference between a square wave and a sine wave isn't a difference
+      in kind — it's a difference in recipe.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="waveform-synth"
+           data-description="Morph between waveform types and hear the difference — shows how changing harmonic content changes the sound">
+      </div>
+      <div class="demo-controls">
+        <label>Waveform <input type="range" min="0" max="100" value="0" data-control="waveform-mix"></label>
+      </div>
+      <div class="demo-caption">
+        Morph between waveform types. As the harmonic recipe changes, so does
+        the sound.
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 5: Harmonics and Timbre
+       ========================================== -->
+  <section class="section" id="harmonics">
+    <h2>Harmonics and Timbre</h2>
+
+    <p>
+      When a violin and a trumpet both play the note A4 (440 Hz), you hear the
+      same pitch — but the sounds are unmistakably different. The property that
+      distinguishes them is <strong>timbre</strong> (pronounced "TAM-ber"),
+      and it arises from the harmonic structure of each instrument's sound.
+    </p>
+
+    <p>
+      When a string vibrates, it doesn't just vibrate as a whole — it
+      simultaneously vibrates in halves, thirds, quarters, and so on. Each mode
+      of vibration produces a frequency that is an integer multiple of the
+      fundamental. These are the <strong>harmonics</strong> (also called
+      <strong>overtones</strong> or <strong>partials</strong>).
+    </p>
+
+    <p>
+      If the fundamental is 440 Hz, the harmonic series is:
+    </p>
+
+    <span class="formula">
+      440, 880, 1320, 1760, 2200, 2640, 3080 ... (f, 2f, 3f, 4f, 5f, 6f, 7f ...)
+    </span>
+
+    <p>
+      Every instrument produces these same frequencies when playing the same
+      note. What differs is the <em>relative strength</em> of each harmonic.
+      A flute produces a nearly pure fundamental with weak upper harmonics. A
+      trumpet has strong upper harmonics that give it brightness and bite. An
+      oboe has an unusually strong set of odd harmonics, giving it that nasal,
+      penetrating quality.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="harmonic-series"
+           data-description="Spectrum bars showing harmonics with adjustable amplitudes — resulting waveform updates in real time">
+      </div>
+      <div class="demo-controls">
+        <label>Fundamental <input type="range" min="100" max="800" value="220" data-control="fundamental"></label>
+      </div>
+      <div class="demo-caption">
+        Adjust the amplitude of each harmonic to sculpt different timbres.
+        The waveform at top shows the resulting composite wave.
+      </div>
+    </div>
+
+    <p>
+      This brings us to one of the most profound ideas in acoustics:
+      <strong>Fourier's theorem</strong>. The French mathematician Joseph
+      Fourier proved in 1822 that any periodic function — any repeating wave,
+      no matter how jagged or complex — can be expressed as a sum of sine waves
+      at specific frequencies and amplitudes.
+    </p>
+
+    <p>
+      This means sound has a dual nature. You can describe it as a waveform in
+      time (the shape of the pressure fluctuation) or as a <strong>spectrum</strong>
+      in frequency (the recipe of sine wave components). Both descriptions are
+      complete and equivalent — they're just two ways of looking at the same
+      thing. The mathematical operation that converts between them is called the
+      <strong>Fourier transform</strong>.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Every sound can be decomposed into sine waves at different frequencies
+        and amplitudes. The recipe of harmonics is what gives each instrument
+        its voice — its timbre.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 6: The Octave
+       ========================================== -->
+  <section class="section" id="octave">
+    <h2>The Octave</h2>
+
+    <p>
+      Of all the possible frequency relationships between two notes, one stands
+      apart as unique: the <strong>octave</strong>, a ratio of
+      <strong>2:1</strong>.
+    </p>
+
+    <p>
+      Play a note at 440 Hz, then play one at 880 Hz. Something remarkable
+      happens — the higher note sounds like "the same note, but higher." This
+      phenomenon is called <strong>octave equivalence</strong>, and it's one of
+      the very few aspects of music perception that appears to be
+      <strong>universal across all human cultures</strong>. Every musical
+      tradition in the world, from Javanese gamelan to European classical to
+      West African drumming, treats notes an octave apart as fundamentally
+      equivalent.
+    </p>
+
+    <p>
+      The reason is physical. When two notes are an octave apart, every harmonic
+      of the higher note is also a harmonic of the lower note. A note at 880 Hz
+      has harmonics at 1760, 2640, 3520... — which are exactly the 2nd, 3rd,
+      and 4th harmonics of 440 Hz. The two sounds share so much harmonic content
+      that our auditory system perceives them as essentially the same pitch
+      class.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="octave-doubling"
+           data-description="Two aligned waveforms showing 2:1 frequency ratio, with audio playback to hear octave equivalence">
+      </div>
+      <div class="demo-controls">
+        <label>Base frequency <input type="range" min="100" max="600" value="220" data-control="base-freq"></label>
+      </div>
+      <div class="demo-caption">
+        The lower wave completes one cycle for every two cycles of the upper
+        wave. Despite the frequency difference, they sound like the same note.
+      </div>
+    </div>
+
+    <p>
+      Because of octave equivalence, music is organized in a fundamentally
+      <strong>circular</strong> way. We don't need an infinite number of note
+      names — we just need enough to fill one octave, and then the pattern
+      repeats. The question, then, becomes: how do we divide the octave? How
+      many notes should there be between one A and the next?
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 7: Consonance and Simple Ratios
+       ========================================== -->
+  <section class="section" id="consonance">
+    <h2>Consonance and Simple Ratios</h2>
+
+    <p>
+      Not all combinations of notes sound equally pleasant. Some pairs blend
+      together smoothly — these are <strong>consonant</strong> intervals. Others
+      create tension and roughness — these are <strong>dissonant</strong>. The
+      ancient Greeks discovered that consonance corresponds to simple frequency
+      ratios.
+    </p>
+
+    <p>
+      The story goes that Pythagoras, walking past a blacksmith's shop, noticed
+      that certain pairs of hammers produced pleasant sounds when struck
+      together. He investigated and found that the pleasing pairs had weights in
+      simple whole-number ratios. Whether the story is true or not, the
+      underlying principle is real and foundational.
+    </p>
+
+    <p>
+      The most consonant interval after the octave (2:1) is the
+      <strong>perfect fifth</strong>, with a ratio of <strong>3:2</strong>. If
+      your base note is 440 Hz, the perfect fifth above it is 660 Hz. This
+      interval sounds open, stable, and powerful — it's the interval between the
+      first two different notes of "Twinkle, Twinkle, Little Star."
+    </p>
+
+    <p>
+      Next comes the <strong>perfect fourth</strong> at <strong>4:3</strong>
+      (about 587 Hz above our 440). Then the <strong>major third</strong> at
+      <strong>5:4</strong> (550 Hz) — the interval that gives major chords their
+      bright, happy quality.
+    </p>
+
+    <p>
+      Why do simple ratios sound consonant? When two notes have harmonics that
+      overlap, the combined sound wave is smooth and periodic. When they don't,
+      the harmonics fall close to each other but not quite on top of each other,
+      creating rapid amplitude fluctuations called <strong>beating</strong>.
+      When the beating is fast enough — roughly 20 to 50 times per second — we
+      perceive it as <strong>roughness</strong>, the sensation that makes
+      dissonance feel uncomfortable.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="interval-explorer"
+           data-description="Two-tone player showing waveform interference pattern and frequency ratio — explore consonance vs dissonance">
+      </div>
+      <div class="demo-controls">
+        <label>Interval ratio <input type="range" min="100" max="200" value="150" data-control="ratio"></label>
+      </div>
+      <div class="demo-caption">
+        Sweep through different frequency ratios. Simple ratios (3:2, 4:3, 5:4)
+        produce smooth, stable waveforms. Complex ratios create beating and roughness.
+      </div>
+    </div>
+
+    <div class="key-idea">
+      <p>
+        Intervals that sound "good" together correspond to simple frequency
+        ratios. When harmonics align, the combined wave is stable and periodic.
+        When they don't, you hear beating and roughness.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 8: Why Twelve Notes?
+       ========================================== -->
+  <section class="section" id="twelve-tones">
+    <h2>Why Twelve Notes?</h2>
+
+    <p>
+      This is the central question of Western music theory: why do we divide the
+      octave into exactly twelve notes? The answer involves one of the most
+      elegant compromises in the history of mathematics.
+    </p>
+
+    <h3>Building a scale from fifths</h3>
+
+    <p>
+      Since the perfect fifth (3:2) is the most consonant interval after the
+      octave, a natural approach is to build a musical scale by stacking fifths.
+      Start on a note — say C. Go up a fifth to G. Up another fifth to D.
+      Continue: A, E, B, F#, C#, G#, D#, A#, F... and after twelve fifths, you
+      arrive at a note that <em>should</em> be the same C you started on, seven
+      octaves higher.
+    </p>
+
+    <p>
+      But it isn't. Twelve perfect fifths gives you a frequency ratio of
+      (3/2)<sup>12</sup> = 129.746..., while seven octaves gives you
+      2<sup>7</sup> = 128. The gap between these two values is called the
+      <strong>Pythagorean comma</strong> — about 23.46 cents (roughly a quarter
+      of a semitone). The circle of fifths doesn't quite close.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap square"
+           data-demo="circle-of-fifths"
+           data-description="Circle visualization showing stacked fifths spiraling outward — the gap where the circle fails to close is the Pythagorean comma">
+      </div>
+      <div class="demo-caption">
+        Stacking perfect fifths creates a spiral, not a circle. The gap at the
+        end — the Pythagorean comma — is the fundamental problem of tuning.
+      </div>
+    </div>
+
+    <h3>The tuning problem</h3>
+
+    <p>
+      This mismatch is a mathematical fact that no amount of cleverness can
+      eliminate. You cannot have perfectly pure fifths <em>and</em> perfectly
+      closed octaves. Something has to give.
+    </p>
+
+    <p>
+      Throughout history, musicians tried different compromises. <strong>Pythagorean
+      tuning</strong> kept the fifths pure and accepted that some intervals would
+      be badly out of tune. <strong>Just intonation</strong> tuned each interval
+      to its simplest ratio (3:2 for fifths, 5:4 for major thirds), but this
+      meant that different keys had different characters — some beautiful, some
+      unusable. <strong>Meantone temperament</strong> slightly narrowed the fifths
+      to make the thirds purer, but this still left some keys sounding awful
+      (the notorious "wolf fifth").
+    </p>
+
+    <h3>Equal temperament: the great compromise</h3>
+
+    <p>
+      The solution that eventually won out — and that defines virtually all
+      Western music today — is <strong>equal temperament</strong>. The idea is
+      radically simple: divide the octave into twelve <em>exactly equal</em>
+      steps. Each step (a <strong>semitone</strong>) is the same frequency
+      ratio:
+    </p>
+
+    <span class="formula">
+      semitone ratio = 2<sup>1/12</sup> &asymp; 1.05946
+    </span>
+
+    <p>
+      To find the frequency of any note, you just count how many semitones it is
+      from a reference pitch and multiply:
+    </p>
+
+    <span class="formula">
+      f(n) = f<sub>0</sub> &times; 2<sup>n/12</sup>
+    </span>
+
+    <p>
+      where <code>f<sub>0</sub></code> is the reference frequency (440 Hz for
+      A4) and <code>n</code> is the number of semitones above or below it.
+    </p>
+
+    <p>
+      The trade-off is that <em>no</em> interval except the octave is perfectly
+      pure. The equal-tempered fifth is 2<sup>7/12</sup> &asymp; 1.4983, not
+      1.5 (the pure 3:2). The equal-tempered major third is 2<sup>4/12</sup>
+      &asymp; 1.2599, not 1.25 (the pure 5:4). These differences are small —
+      about 2 cents for the fifth, 14 cents for the third — and most listeners
+      can't distinguish them.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="temperament-comparison"
+           data-description="Play the same interval in just intonation vs equal temperament — hear and see the subtle difference">
+      </div>
+      <div class="demo-controls">
+        <label>Interval <input type="range" min="1" max="11" value="7" data-control="interval"></label>
+      </div>
+      <div class="demo-caption">
+        Compare an interval in just intonation (pure ratio) vs equal temperament.
+        The difference is subtle but real.
+      </div>
+    </div>
+
+    <p>
+      What equal temperament sacrifices in purity, it gains in freedom. Because
+      every key uses exactly the same interval structure, you can play in any key
+      and modulate freely between keys without anything sounding "wrong." This
+      symmetry was revolutionary — it enabled the chromatic harmony of Bach, the
+      key changes of Beethoven, the jazz of Coltrane, and essentially all of
+      modern popular music.
+    </p>
+
+    <p>
+      Bach's <em>The Well-Tempered Clavier</em> (1722) was a landmark work
+      specifically designed to demonstrate this freedom — 24 preludes and fugues,
+      one in every major and minor key, all playable on a single instrument
+      tuned in a (nearly) equal temperament.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        The 12-tone system is a mathematical compromise. We sacrifice the purity
+        of individual intervals to gain the ability to play in any key. This
+        single trade-off enabled centuries of Western harmonic music.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 9: Scales and the Keyboard
+       ========================================== -->
+  <section class="section" id="scales">
+    <h2>Scales and the Keyboard</h2>
+
+    <p>
+      Equal temperament gives us twelve equally spaced notes per octave. This
+      complete set is the <strong>chromatic scale</strong>: C, C#, D, D#, E, F,
+      F#, G, G#, A, A#, B — and then the pattern repeats.
+    </p>
+
+    <p>
+      But twelve notes at once is a lot. Most music uses subsets — seven-note
+      <strong>scales</strong> that select certain intervals and skip others,
+      creating a characteristic pattern of whole steps and half steps.
+    </p>
+
+    <p>
+      The <strong>major scale</strong> follows the pattern: whole, whole, half,
+      whole, whole, whole, half (W-W-H-W-W-W-H). Starting on C, this gives you
+      C-D-E-F-G-A-B — all the white keys on a piano. The major scale sounds
+      bright and resolved; it's the "do-re-mi" of everyday music.
+    </p>
+
+    <p>
+      The <strong>natural minor scale</strong> uses a different pattern: W-H-W-W-H-W-W.
+      Starting on A, you get A-B-C-D-E-F-G — again, all white keys, but the
+      different starting point changes the pattern of intervals, giving the
+      minor scale its darker, more melancholic character.
+    </p>
+
+    <h3>The piano keyboard</h3>
+
+    <p>
+      The piano keyboard is a physical map of the chromatic scale. White keys
+      are the notes of the C major scale. Black keys fill in the remaining five
+      chromatic notes (the sharps/flats). This is why the black keys appear in
+      groups of two and three — and why there are <em>no</em> black keys between
+      E and F, or between B and C. Those are the places where the major scale
+      already has a half step.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap short"
+           data-demo="piano-keyboard"
+           data-description="Interactive piano keyboard showing scale patterns, note names, and frequencies — click keys to hear notes">
+      </div>
+      <div class="demo-controls">
+        <label>Scale <input type="range" min="0" max="3" value="0" data-control="scale-type"></label>
+      </div>
+      <div class="demo-caption">
+        Click the keys to hear notes. Select different scales to see which notes
+        are included. Notice the whole-step and half-step pattern.
+      </div>
+    </div>
+
+    <p>
+      It's worth noting that the major and minor scales are just two of many
+      possible seven-note selections from the twelve chromatic notes. The
+      <strong>modes</strong> — Dorian, Phrygian, Lydian, Mixolydian, and others —
+      are alternative selections with their own distinctive moods. And beyond
+      Western music, cultures around the world have developed scales with
+      different numbers of notes: the pentatonic scale (five notes, found in
+      blues, rock, and many folk traditions), the whole-tone scale (six notes),
+      and microtonal systems with more than twelve notes per octave.
+    </p>
+  </section>
+
+  <hr class="section-break">
+
+  <!-- ==========================================
+       Section 10: Seeing and Building Sound
+       ========================================== -->
+  <section class="section" id="seeing-sound">
+    <h2>Seeing and Building Sound</h2>
+
+    <p>
+      Throughout this article, we've described sound in two ways: as a waveform
+      (pressure over time) and as a spectrum (energy at each frequency). There's
+      a powerful visualization that combines both: the <strong>spectrogram</strong>.
+    </p>
+
+    <p>
+      A spectrogram plots <strong>frequency on the vertical axis</strong> and
+      <strong>time on the horizontal axis</strong>, using color or brightness
+      to represent <strong>amplitude</strong>. It's a complete picture of a
+      sound: you can see the fundamental and harmonics as horizontal bands,
+      watch them shift as pitch changes, and observe how the harmonic recipe
+      evolves over the life of a note.
+    </p>
+
+    <p>
+      Learning to read a spectrogram is like learning to read a language. A pure
+      sine wave appears as a single horizontal line. A sawtooth wave appears as
+      a stack of evenly-spaced lines (its harmonics). A chord appears as
+      multiple groups of harmonic stacks. Speech appears as constantly shifting
+      ribbons of energy — the formants that distinguish vowels from each other.
+    </p>
+
+    <h3>Synthesis: building sound from scratch</h3>
+
+    <p>
+      If every sound can be decomposed into sine waves, then every sound can
+      also be <em>built</em> from sine waves. This is <strong>additive
+      synthesis</strong>: start with silence and add sine wave components one by
+      one, each at a specific frequency, amplitude, and phase, until you've
+      reconstructed the target sound.
+    </p>
+
+    <p>
+      In practice, additive synthesis can require dozens or hundreds of
+      individually controlled sine waves to sound convincing. So synthesizers
+      often use the opposite approach: <strong>subtractive synthesis</strong>.
+      Start with a harmonically rich waveform (like a sawtooth) and use
+      <strong>filters</strong> to carve away unwanted frequencies, sculpting the
+      timbre like a sculptor removing marble to reveal a form.
+    </p>
+
+    <p>
+      A third approach is <strong>FM (frequency modulation) synthesis</strong>,
+      where one wave modulates the frequency of another. This can produce
+      extraordinarily complex and evolving timbres from just two oscillators —
+      it's the technology behind the iconic Yamaha DX7, one of the best-selling
+      synthesizers of all time.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="additive-synth"
+           data-description="Harmonic sliders building a complex tone — waveform display above, spectrum display below">
+      </div>
+      <div class="demo-controls">
+        <label>Fundamental <input type="range" min="100" max="800" value="220" data-control="fundamental"></label>
+      </div>
+      <div class="demo-caption">
+        Build a sound from individual harmonics. Each slider controls the
+        amplitude of one harmonic. Watch the waveform and spectrum update in
+        real time.
+      </div>
+    </div>
+
+    <h3>Digital audio</h3>
+
+    <p>
+      All of these ideas converge in digital audio. A microphone converts
+      pressure waves into an electrical signal. An <strong>analog-to-digital
+      converter</strong> samples that signal thousands of times per second —
+      typically 44,100 times (CD quality) or 48,000 times (professional audio).
+      Each sample is a number representing the pressure at that instant.
+    </p>
+
+    <p>
+      The <strong>Nyquist theorem</strong> guarantees that if you sample at
+      twice the highest frequency present in the signal, you can perfectly
+      reconstruct the original continuous waveform. Since human hearing tops out
+      at about 20 kHz, a 44.1 kHz sample rate captures everything we can hear.
+    </p>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="spectrogram"
+           data-description="Real-time spectrogram visualization — see the frequency content of sound as it changes over time">
+      </div>
+      <div class="demo-caption">
+        A real-time spectrogram. Time flows left to right, frequency increases
+        upward, and brightness indicates energy. Watch how different sounds
+        paint different patterns.
+      </div>
+    </div>
+
+    <div class="demo-container">
+      <div class="demo-canvas-wrap"
+           data-demo="full-synth"
+           data-description="Combined keyboard, waveform selector, spectrum analyzer, and spectrogram — a complete synthesizer workstation">
+      </div>
+      <div class="demo-controls">
+        <label>Waveform <input type="range" min="0" max="3" value="0" data-control="waveform"></label>
+      </div>
+      <div class="demo-caption">
+        A complete synthesizer: play notes on the keyboard, choose a waveform,
+        and watch the sound in all three representations — waveform, spectrum,
+        and spectrogram — simultaneously.
+      </div>
+    </div>
+
+    <p>
+      From the vibrations of a guitar string to the mathematics of Fourier
+      transforms, from the Pythagorean comma to the precision of digital
+      sampling — sound and music sit at a remarkable intersection of physics,
+      mathematics, perception, and culture. Every note you hear is a pressure
+      wave. Every melody is a pattern of frequency ratios. And the twelve-tone
+      system that underlies most of the music you know is a centuries-old
+      compromise between mathematical purity and practical freedom.
+    </p>
+
+    <div class="key-idea">
+      <p>
+        Every sound can be both built from scratch (synthesis) and taken apart
+        into components (analysis). The spectrogram is the bridge — a way to
+        see what we hear.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="article-footer">
+    <p>
+      <a href="../../index.html">&larr; Back to Adam's Tools</a>
+    </p>
+  </footer>
+
+</article>
+
+<!-- Scripts: app.js defines the registry, then demos register, then init runs -->
+<script src="js/app.js"></script>
+<script>initAll();</script>
+
+</body>
+</html>

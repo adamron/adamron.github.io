@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v9';
+const CACHE_NAME = 'tools-v10';
 const ASSETS = [
   '/',
   '/index.html',
@@ -111,7 +111,10 @@ const ASSETS = [
   '/tools/weather/js/fronts.js',
   '/tools/weather/js/storm-cell.js',
   '/tools/weather/js/global-circulation.js',
-  '/tools/weather/js/full-weather.js'
+  '/tools/weather/js/full-weather.js',
+  '/tools/sound-music/index.html',
+  '/tools/sound-music/css/styles.css',
+  '/tools/sound-music/js/app.js'
 ];
 
 self.addEventListener('install', event => {
