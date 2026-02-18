@@ -114,7 +114,10 @@ const ASSETS = [
   '/tools/weather/js/full-weather.js',
   '/tools/sound-music/index.html',
   '/tools/sound-music/css/styles.css',
-  '/tools/sound-music/js/app.js'
+  '/tools/sound-music/js/app.js',
+  '/tools/sound-music/js/pressure-wave.js',
+  '/tools/sound-music/js/wave-anatomy.js',
+  '/tools/sound-music/js/pitch-frequency.js'
 ];
 
 self.addEventListener('install', event => {

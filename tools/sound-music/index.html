@@ -63,13 +63,13 @@
     </p>
 
     <div class="demo-container">
-      <div class="demo-canvas-wrap short"
+      <div class="demo-canvas-wrap square"
            data-demo="pressure-wave"
-           data-description="Animated 1D particle compression wave showing regions of compression and rarefaction">
+           data-description="2D pressure wave simulation with draggable sound source and wall reflections">
       </div>
       <div class="demo-caption">
-        Watch the pressure pattern propagate. The individual particles oscillate
-        in place — only the wave moves forward.
+        Drag the sound source to move it. Waves reflect off the walls, creating
+        interference patterns.
       </div>
     </div>
 
@@ -209,11 +209,11 @@
            data-description="Tone generator with frequency slider and note name display — hear how pitch changes with frequency">
       </div>
       <div class="demo-controls">
-        <label>Frequency <input type="range" min="60" max="2000" value="440" data-control="frequency"></label>
+        <label>Volume <input type="range" min="0" max="100" value="50" data-control="volume"></label>
       </div>
       <div class="demo-caption">
-        Drag the slider to change the frequency. Notice how equal distances on
-        the slider don't sound like equal pitch steps — perception is logarithmic.
+        Click and drag left/right to change frequency. Notice how equal
+        distances don't sound like equal pitch steps — perception is logarithmic.
       </div>
     </div>
 
@@ -886,6 +886,9 @@
 
 <!-- Scripts: app.js defines the registry, then demos register, then init runs -->
 <script src="js/app.js"></script>
+<script src="js/pressure-wave.js"></script>
+<script src="js/wave-anatomy.js"></script>
+<script src="js/pitch-frequency.js"></script>
 <script>initAll();</script>
 
 </body>
