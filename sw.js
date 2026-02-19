@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v10';
+const CACHE_NAME = 'tools-v11';
 const ASSETS = [
   '/',
   '/index.html',
@@ -121,7 +121,10 @@ const ASSETS = [
   '/tools/sound-music/js/waveform-shapes.js',
   '/tools/sound-music/js/waveform-synth.js',
   '/tools/sound-music/js/harmonic-series.js',
-  '/tools/sound-music/js/octave-doubling.js'
+  '/tools/sound-music/js/octave-doubling.js',
+  '/tools/sound-music/js/spectrogram.js',
+  '/tools/sound-music/js/interval-explorer.js',
+  '/tools/sound-music/js/circle-of-fifths.js'
 ];
 
 self.addEventListener('install', event => {

@@ -73,65 +73,8 @@ registerDemo("waveform-synth", {
       }
     }
 
-    // --- Spectrogram buffer (offscreen canvas that scrolls left) ---
-    let spectCanvas = null;
-    let spectCtx = null;
-    let spectW = 0;
-    let spectH = 0;
-
-    function ensureSpectBuffer(w, h) {
-      if (spectCanvas && spectW === w && spectH === h) return;
-      spectCanvas = document.createElement("canvas");
-      spectCanvas.width = w;
-      spectCanvas.height = h;
-      spectCtx = spectCanvas.getContext("2d");
-      spectCtx.fillStyle = "#0a0a0a";
-      spectCtx.fillRect(0, 0, w, h);
-      spectW = w;
-      spectH = h;
-    }
-
-    // Paint one column of FFT data into the spectrogram
-    // freqData: Float32Array of dB values from analyser
-    // maxFreq: the frequency represented by the top pixel
-    function pushSpectColumnFFT(freqData, sampleRate, fftSize, maxFreq) {
-      spectCtx.drawImage(spectCanvas, -1, 0);
-      spectCtx.fillStyle = "#0a0a0a";
-      spectCtx.fillRect(spectW - 1, 0, 1, spectH);
-
-      const binCount = freqData.length;
-      const binFreqWidth = sampleRate / fftSize;
-      const maxBin = Math.min(binCount, Math.ceil(maxFreq / binFreqWidth));
-
-      for (let row = 0; row < spectH; row++) {
-        // Map pixel row to frequency (bottom = 0, top = maxFreq)
-        const freq = ((spectH - 1 - row) / (spectH - 1)) * maxFreq;
-        const bin = freq / binFreqWidth;
-        const binLow = Math.floor(bin);
-        const binHigh = Math.min(binLow + 1, maxBin - 1);
-        const frac = bin - binLow;
-
-        if (binLow >= maxBin) continue;
-
-        // Interpolate dB value
-        const dbLow = freqData[binLow];
-        const dbHigh = freqData[binHigh];
-        const db = dbLow + (dbHigh - dbLow) * frac;
-
-        // Map dB to intensity (analyser typically gives -100 to 0 dB)
-        const intensity = Math.max(0, Math.min(1, (db + 90) / 70));
-        if (intensity < 0.01) continue;
-
-        // Warm colormap: dark purple → magenta → peach → white
-        const i2 = Math.sqrt(intensity); // inverse gamma to brighten
-        const r = Math.round(30 + 225 * i2);
-        const g = Math.round(10 + 180 * i2 * i2);
-        const b = Math.round(40 + 160 * i2);
-
-        spectCtx.fillStyle = `rgb(${r},${g},${b})`;
-        spectCtx.fillRect(spectW - 1, row, 1, 1);
-      }
-    }
+    // --- Spectrogram buffer (shared utility) ---
+    const spect = createSpectrogram();
 
     // --- Web Audio with AnalyserNode ---
     let audioCtx = null;
@@ -315,19 +258,16 @@ registerDemo("waveform-synth", {
       ctx.stroke();
 
       // --- Right: Spectrogram ---
-      ensureSpectBuffer(rightW, contentH);
+      spect.ensure(rightW, contentH);
 
       if (analyser && freqData) {
         analyser.getFloatFrequencyData(freqData);
-        pushSpectColumnFFT(freqData, audioCtx.sampleRate, analyser.fftSize, SPECT_MAX_FREQ);
+        spect.pushColumn(freqData, audioCtx.sampleRate, analyser.fftSize, SPECT_MAX_FREQ);
       } else {
-        // When not playing, push a silent column
-        spectCtx.drawImage(spectCanvas, -1, 0);
-        spectCtx.fillStyle = "#0a0a0a";
-        spectCtx.fillRect(spectW - 1, 0, 1, spectH);
+        spect.pushSilent();
       }
 
-      ctx.drawImage(spectCanvas, 0, 0, spectW, spectH, rightX, contentTop, rightW, contentH);
+      ctx.drawImage(spect.canvas, 0, 0, spect.width, spect.height, rightX, contentTop, rightW, contentH);
 
       // Border
       ctx.strokeStyle = "rgba(255,255,255,0.06)";
