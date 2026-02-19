@@ -124,7 +124,8 @@ const ASSETS = [
   '/tools/sound-music/js/octave-doubling.js',
   '/tools/sound-music/js/spectrogram.js',
   '/tools/sound-music/js/interval-explorer.js',
-  '/tools/sound-music/js/circle-of-fifths.js'
+  '/tools/sound-music/js/circle-of-fifths.js',
+  '/tools/sound-music/js/temperament-comparison.js'
 ];
 
 self.addEventListener('install', event => {
