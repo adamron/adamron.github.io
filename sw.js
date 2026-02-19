@@ -119,7 +119,8 @@ const ASSETS = [
   '/tools/sound-music/js/wave-anatomy.js',
   '/tools/sound-music/js/pitch-frequency.js',
   '/tools/sound-music/js/waveform-shapes.js',
-  '/tools/sound-music/js/waveform-synth.js'
+  '/tools/sound-music/js/waveform-synth.js',
+  '/tools/sound-music/js/harmonic-series.js'
 ];
 
 self.addEventListener('install', event => {
