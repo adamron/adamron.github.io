@@ -11,24 +11,25 @@
   var padEls      = [];
   var topBtnEls   = [];
   var sideBtnEls  = [];
-  var pointerDown = false;
+  var pointerDown  = false;
   var lastMidiSend = 0;
-  var MIDI_FPS     = 33;  /* ~30 fps cap for MIDI output */
+  var MIDI_FPS     = 33;
+
+  /* ── double-tap state ───────────────────────────────────────── */
+
+  var lastTapBtn   = -1;
+  var lastTapTime  = 0;
+  var DOUBLE_TAP   = 350;
 
   /* ── helpers ────────────────────────────────────────────────── */
 
   function hexToRgb(hex) {
-    return [
-      parseInt(hex.slice(1, 3), 16),
-      parseInt(hex.slice(3, 5), 16),
-      parseInt(hex.slice(5, 7), 16)
-    ];
+    return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
   }
 
   /* ── build grid ─────────────────────────────────────────────── */
 
   function buildGrid() {
-    /* row 0: 8 top buttons + corner */
     for (var i = 0; i < SIZE; i++) {
       var btn = document.createElement('button');
       btn.className = 'ctrl-btn';
@@ -42,7 +43,6 @@
     corner.className = 'corner';
     gridEl.appendChild(corner);
 
-    /* rows 1-8: pads + side buttons */
     for (var r = 0; r < SIZE; r++) {
       var row = [];
       for (var c = 0; c < SIZE; c++) {
@@ -73,7 +73,7 @@
   function preventDefault(e) { e.preventDefault(); }
 
   function modeHandler(i) {
-    return function (e) { e.preventDefault(); selectMode(i); };
+    return function (e) { e.preventDefault(); onModeButton(i); };
   }
   function paletteHandler(i) {
     return function (e) { e.preventDefault(); selectPalette(i); };
@@ -94,7 +94,19 @@
   document.addEventListener('pointerup',    function () { pointerDown = false; });
   document.addEventListener('pointercancel', function () { pointerDown = false; });
 
-  /* ── mode / palette selection ───────────────────────────────── */
+  /* ── double-tap mode selection ──────────────────────────────── */
+
+  function onModeButton(i) {
+    var now = performance.now();
+    if (i === lastTapBtn && now - lastTapTime < DOUBLE_TAP) {
+      selectMode(i + SIZE);
+      lastTapBtn = -1;
+    } else {
+      selectMode(i);
+      lastTapBtn = i;
+      lastTapTime = now;
+    }
+  }
 
   function selectMode(i) {
     lp.setMode(i);
@@ -110,16 +122,22 @@
     sendMidiButtons();
   }
 
+  /* ── button visuals ─────────────────────────────────────────── */
+
   function updateButtons() {
-    var mode    = lp.getMode();
-    var palette = lp.getPalette();
+    var mode       = lp.getMode();
+    var modeBtn    = mode % SIZE;
+    var secondary  = mode >= SIZE;
+    var palette    = lp.getPalette();
 
     for (var i = 0; i < SIZE; i++) {
       var tb = topBtnEls[i];
-      if (i === mode) {
+      tb.classList.remove('secondary');
+      if (i === modeBtn) {
         tb.style.backgroundColor = lp.MODE_COLORS[i];
         tb.style.boxShadow       = '0 0 8px ' + lp.MODE_COLORS[i];
         tb.style.borderColor     = 'transparent';
+        if (secondary) tb.classList.add('secondary');
       } else {
         tb.style.backgroundColor = '';
         tb.style.boxShadow       = '';
@@ -140,25 +158,31 @@
   }
 
   function updateStatus() {
+    var mode      = lp.getMode();
+    var secondary = mode >= SIZE;
+
     var midi = '';
     if (LaunchpadMidi.isConnected()) {
       var sysex = LaunchpadMidi.hasSysex() ? '' : ' (no SysEx)';
       midi = ' | <span style="color:#4c4">' + LaunchpadMidi.deviceName() + sysex + '</span>';
     }
-    statusEl.innerHTML =
-      '<span>' + lp.MODE_NAMES[lp.getMode()] + '</span> | ' +
-      lp.PALETTES[lp.getPalette()].name + midi +
-      '<br>' + lp.MODE_DESCS[lp.getMode()];
+
+    var label = secondary
+      ? '<span>' + lp.MODE_NAMES[mode] + '</span> <span style="color:#888;font-size:0.75em">2&times;</span>'
+      : '<span>' + lp.MODE_NAMES[mode] + '</span>';
+
+    statusEl.innerHTML = label + ' | ' + lp.PALETTES[lp.getPalette()].name + midi +
+      '<br>' + lp.MODE_DESCS[mode];
   }
 
   /* ── MIDI button sync ───────────────────────────────────────── */
 
   function sendMidiButtons() {
     if (!LaunchpadMidi.isConnected()) return;
-    var mode    = lp.getMode();
+    var modeBtn = lp.getMode() % SIZE;
     var palette = lp.getPalette();
     for (var i = 0; i < SIZE; i++) {
-      LaunchpadMidi.sendTopButton(i,  i === mode    ? hexToRgb(lp.MODE_COLORS[i])    : [0, 0, 0]);
+      LaunchpadMidi.sendTopButton(i,  i === modeBtn ? hexToRgb(lp.MODE_COLORS[i]) : [0, 0, 0]);
       LaunchpadMidi.sendSideButton(i, i === palette ? hexToRgb(lp.PALETTE_PREVIEW[i]) : [0, 0, 0]);
     }
   }
@@ -188,12 +212,10 @@
   function animate(now) {
     var frame = lp.update(now);
     render(frame);
-
     if (LaunchpadMidi.isConnected() && now - lastMidiSend > MIDI_FPS) {
       LaunchpadMidi.sendFrame(frame);
       lastMidiSend = now;
     }
-
     requestAnimationFrame(animate);
   }
 
@@ -205,7 +227,7 @@
     });
 
     LaunchpadMidi.onTopButton(function (i) {
-      selectMode(i);
+      onModeButton(i);
     });
 
     LaunchpadMidi.onSideButton(function (i) {
