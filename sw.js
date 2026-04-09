@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v12';
+const CACHE_NAME = 'tools-v13';
 const ASSETS = [
   '/',
   '/index.html',
@@ -132,6 +132,7 @@ const ASSETS = [
   '/tools/sound-music/js/full-synth.js',
   '/tools/launchpad/index.html',
   '/tools/launchpad/js/launchpad.js',
+  '/tools/launchpad/js/midi.js',
   '/tools/launchpad/js/ui.js'
 ];
 

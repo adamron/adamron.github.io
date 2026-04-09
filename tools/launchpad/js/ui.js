@@ -6,12 +6,24 @@
 
   /* ── DOM references ─────────────────────────────────────────── */
 
-  var gridEl     = document.getElementById('grid');
-  var statusEl   = document.getElementById('status');
-  var padEls     = [];
-  var topBtnEls  = [];
-  var sideBtnEls = [];
+  var gridEl      = document.getElementById('grid');
+  var statusEl    = document.getElementById('status');
+  var padEls      = [];
+  var topBtnEls   = [];
+  var sideBtnEls  = [];
   var pointerDown = false;
+  var lastMidiSend = 0;
+  var MIDI_FPS     = 33;  /* ~30 fps cap for MIDI output */
+
+  /* ── helpers ────────────────────────────────────────────────── */
+
+  function hexToRgb(hex) {
+    return [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ];
+  }
 
   /* ── build grid ─────────────────────────────────────────────── */
 
@@ -56,7 +68,7 @@
     }
   }
 
-  /* ── event helpers ──────────────────────────────────────────── */
+  /* ── pointer event helpers ──────────────────────────────────── */
 
   function preventDefault(e) { e.preventDefault(); }
 
@@ -79,8 +91,8 @@
     };
   }
 
-  document.addEventListener('pointerup',     function () { pointerDown = false; });
-  document.addEventListener('pointercancel',  function () { pointerDown = false; });
+  document.addEventListener('pointerup',    function () { pointerDown = false; });
+  document.addEventListener('pointercancel', function () { pointerDown = false; });
 
   /* ── mode / palette selection ───────────────────────────────── */
 
@@ -88,12 +100,14 @@
     lp.setMode(i);
     updateButtons();
     updateStatus();
+    sendMidiButtons();
   }
 
   function selectPalette(i) {
     lp.setPalette(i);
     updateButtons();
     updateStatus();
+    sendMidiButtons();
   }
 
   function updateButtons() {
@@ -126,10 +140,27 @@
   }
 
   function updateStatus() {
+    var midi = '';
+    if (LaunchpadMidi.isConnected()) {
+      var sysex = LaunchpadMidi.hasSysex() ? '' : ' (no SysEx)';
+      midi = ' | <span style="color:#4c4">' + LaunchpadMidi.deviceName() + sysex + '</span>';
+    }
     statusEl.innerHTML =
       '<span>' + lp.MODE_NAMES[lp.getMode()] + '</span> | ' +
-      lp.PALETTES[lp.getPalette()].name +
+      lp.PALETTES[lp.getPalette()].name + midi +
       '<br>' + lp.MODE_DESCS[lp.getMode()];
+  }
+
+  /* ── MIDI button sync ───────────────────────────────────────── */
+
+  function sendMidiButtons() {
+    if (!LaunchpadMidi.isConnected()) return;
+    var mode    = lp.getMode();
+    var palette = lp.getPalette();
+    for (var i = 0; i < SIZE; i++) {
+      LaunchpadMidi.sendTopButton(i,  i === mode    ? hexToRgb(lp.MODE_COLORS[i])    : [0, 0, 0]);
+      LaunchpadMidi.sendSideButton(i, i === palette ? hexToRgb(lp.PALETTE_PREVIEW[i]) : [0, 0, 0]);
+    }
   }
 
   /* ── render frame → DOM ─────────────────────────────────────── */
@@ -155,8 +186,45 @@
   /* ── animation loop ─────────────────────────────────────────── */
 
   function animate(now) {
-    render(lp.update(now));
+    var frame = lp.update(now);
+    render(frame);
+
+    if (LaunchpadMidi.isConnected() && now - lastMidiSend > MIDI_FPS) {
+      LaunchpadMidi.sendFrame(frame);
+      lastMidiSend = now;
+    }
+
     requestAnimationFrame(animate);
+  }
+
+  /* ── MIDI wiring ────────────────────────────────────────────── */
+
+  function initMidi() {
+    LaunchpadMidi.onPad(function (r, c) {
+      lp.pressPad(r, c, performance.now());
+    });
+
+    LaunchpadMidi.onTopButton(function (i) {
+      selectMode(i);
+    });
+
+    LaunchpadMidi.onSideButton(function (i) {
+      selectPalette(i);
+    });
+
+    LaunchpadMidi.onConnect(function () {
+      sendMidiButtons();
+      updateStatus();
+    });
+
+    LaunchpadMidi.onDisconnect(function () {
+      updateStatus();
+    });
+
+    LaunchpadMidi.connect().then(function (ok) {
+      if (ok) sendMidiButtons();
+      updateStatus();
+    });
   }
 
   /* ── init ───────────────────────────────────────────────────── */
@@ -164,5 +232,6 @@
   buildGrid();
   updateButtons();
   updateStatus();
+  initMidi();
   requestAnimationFrame(animate);
 })();
