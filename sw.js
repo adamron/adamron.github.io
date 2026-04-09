@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v11';
+const CACHE_NAME = 'tools-v12';
 const ASSETS = [
   '/',
   '/index.html',
@@ -129,7 +129,10 @@ const ASSETS = [
   '/tools/sound-music/js/piano-keyboard.js',
   '/tools/sound-music/js/additive-synth.js',
   '/tools/sound-music/js/spectrogram-mic.js',
-  '/tools/sound-music/js/full-synth.js'
+  '/tools/sound-music/js/full-synth.js',
+  '/tools/launchpad/index.html',
+  '/tools/launchpad/js/launchpad.js',
+  '/tools/launchpad/js/ui.js'
 ];
 
 self.addEventListener('install', event => {
