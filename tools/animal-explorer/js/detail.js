@@ -70,7 +70,10 @@
   // Navigate to next/previous animal
   AE.navigate = function(direction) {
     if (AE.state.filteredIndices.length === 0) return;
-    if (AE.isNavLocked()) return;
+    if (AE.isNavLocked()) {
+      AE.signalNavBlocked();
+      return;
+    }
 
     var currentFilteredPos = AE.state.filteredIndices.indexOf(AE.state.currentIndex);
     var newFilteredPos = currentFilteredPos + direction;

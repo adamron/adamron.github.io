@@ -25,14 +25,61 @@
 
   // Navigation lock: ignore card changes until the lock period has passed
   var lastCardChange = 0;
+  var lockTimeout = null;
 
   AE.markCardChange = function() {
     lastCardChange = Date.now();
+
+    // Dim the nav controls for the duration of the lock
+    clearTimeout(lockTimeout);
+    AE.els.detail.classList.remove('nav-locked');
+    if (AE.settings.navLock && AE.settings.navLockSeconds > 0) {
+      AE.els.detail.classList.add('nav-locked');
+      lockTimeout = setTimeout(function() {
+        AE.els.detail.classList.remove('nav-locked');
+      }, AE.settings.navLockSeconds * 1000);
+    }
   };
 
   AE.isNavLocked = function() {
     if (!AE.settings.navLock) return false;
     return Date.now() - lastCardChange < AE.settings.navLockSeconds * 1000;
+  };
+
+  // Feedback when a card change is blocked: shake the picture and play a soft bonk
+  var audioCtx = null;
+  var lastBlockedSignal = 0;
+
+  function playBonk() {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    var now = audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.15);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
+  AE.signalNavBlocked = function() {
+    // Held keys and trackpad scrolls fire repeatedly, so only signal occasionally
+    var now = Date.now();
+    if (now - lastBlockedSignal < 400) return;
+    lastBlockedSignal = now;
+
+    var img = AE.els.detailImg;
+    img.classList.remove('blocked');
+    void img.offsetWidth;
+    img.classList.add('blocked');
+    playBonk();
   };
 
   // Speak the animal name and bounce the title while speaking

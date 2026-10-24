@@ -5,7 +5,15 @@
   var dragStartX = 0;
   var dragCurrentX = 0;
 
+  // Drag attempted while navigation is locked: the picture stays put
+  var isBlockedDrag = false;
+
   function startDrag(x) {
+    if (AE.isNavLocked()) {
+      isBlockedDrag = true;
+      dragStartX = x;
+      return;
+    }
     isDragging = true;
     dragStartX = x;
     dragCurrentX = x;
@@ -13,6 +21,11 @@
   }
 
   function moveDrag(x) {
+    // Only signal once the finger has actually moved, so taps stay silent
+    if (isBlockedDrag && Math.abs(x - dragStartX) > 20) {
+      isBlockedDrag = false;
+      AE.signalNavBlocked();
+    }
     if (!isDragging) return;
     dragCurrentX = x;
     var diff = dragCurrentX - dragStartX;
@@ -22,6 +35,7 @@
   }
 
   function endDrag() {
+    isBlockedDrag = false;
     if (!isDragging) return;
     isDragging = false;
     AE.els.detailImg.classList.remove('dragging');
@@ -91,7 +105,7 @@
     });
 
     document.addEventListener('mousemove', function(e) {
-      if (isDragging) {
+      if (isDragging || isBlockedDrag) {
         e.preventDefault();
         moveDrag(e.clientX);
       }

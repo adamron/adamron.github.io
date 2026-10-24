@@ -348,6 +348,21 @@ body {
   transition: none;
 }
 
+.detail-content img.blocked {
+  animation: blocked-shake 0.3s ease-in-out;
+}
+
+@keyframes blocked-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.detail.nav-locked .nav-btn {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
 .nav-btn {
   position: absolute;
   top: 50%;
