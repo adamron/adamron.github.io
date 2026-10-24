@@ -5,7 +5,20 @@
   var defaults = {
     speakNames: true,
     navLock: false,
-    navLockSeconds: 0.5
+    navLockSeconds: 0.5,
+    music: false,
+    colourful: false
+  };
+
+  // Card colours for the colourful theme, cycled by animal
+  var CARD_COLOURS = ['#e6007e', '#00a8e0', '#ff7a00', '#e31e24', '#8e2fa8', '#2fa84f'];
+
+  AE.cardColour = function(index) {
+    return CARD_COLOURS[index % CARD_COLOURS.length];
+  };
+
+  AE.applyTheme = function() {
+    document.body.classList.toggle('theme-colourful', AE.settings.colourful);
   };
 
   AE.settings = Object.assign({}, defaults);
@@ -89,6 +102,7 @@
   function stopBounce() {
     clearTimeout(speakingTimeout);
     AE.els.detailTitle.classList.remove('speaking');
+    AE.duckMusic(false);
   }
 
   AE.speakName = function(name) {
@@ -110,6 +124,7 @@
     // Restart the animation even if the class was just removed
     void AE.els.detailTitle.offsetWidth;
     AE.els.detailTitle.classList.add('speaking');
+    AE.duckMusic(true);
     // Some browsers never fire onend, so cap the animation
     speakingTimeout = setTimeout(finish, 4000);
 
@@ -131,11 +146,16 @@
     var speakInput = document.getElementById('setting-speak');
     var lockInput = document.getElementById('setting-lock');
     var lockSecondsInput = document.getElementById('setting-lock-seconds');
+    var musicInput = document.getElementById('setting-music');
+    var colourfulInput = document.getElementById('setting-colourful');
 
     speakInput.checked = AE.settings.speakNames;
     lockInput.checked = AE.settings.navLock;
     lockSecondsInput.value = AE.settings.navLockSeconds;
     lockSecondsInput.disabled = !AE.settings.navLock;
+    musicInput.checked = AE.settings.music;
+    colourfulInput.checked = AE.settings.colourful;
+    AE.applyTheme();
 
     toggle.addEventListener('click', function() {
       panel.classList.toggle('open');
@@ -150,6 +170,22 @@
     lockInput.addEventListener('change', function() {
       AE.settings.navLock = lockInput.checked;
       lockSecondsInput.disabled = !lockInput.checked;
+      save();
+    });
+
+    musicInput.addEventListener('change', function() {
+      AE.settings.music = musicInput.checked;
+      if (musicInput.checked) {
+        AE.startMusic();
+      } else {
+        AE.stopMusic();
+      }
+      save();
+    });
+
+    colourfulInput.addEventListener('change', function() {
+      AE.settings.colourful = colourfulInput.checked;
+      AE.applyTheme();
       save();
     });
 

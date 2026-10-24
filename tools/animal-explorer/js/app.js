@@ -6,6 +6,7 @@
 
     // Load saved settings and wire up the settings panel
     AE.initSettings();
+    AE.initMusic();
 
     // Initialize detail view tag elements
     AE.initTagElements();

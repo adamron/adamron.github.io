@@ -11,6 +11,7 @@
       var tile = document.createElement('div');
       tile.className = 'animal-tile';
       tile.dataset.index = index;
+      tile.style.setProperty('--card-colour', AE.cardColour(index));
 
       // Hide animals without an image path
       if (!animal.image) {

@@ -34,6 +34,7 @@
     AE.els.detailImg.src = animal.image;
     AE.els.detailImg.alt = animal.name;
     AE.els.detailTitle.textContent = animal.name;
+    AE.els.detail.style.setProperty('--card-colour', AE.cardColour(AE.state.currentIndex));
     AE.speakName(animal.name);
 
     // Counter shows position in filtered list

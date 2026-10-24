@@ -105,6 +105,17 @@ body {
   opacity: 0.4;
 }
 
+.setting-credit {
+  margin-top: -0.4rem;
+  padding-left: 1.6rem;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.setting-credit a {
+  color: inherit;
+}
+
 /* Filters */
 .filters {
   margin-bottom: 1.5rem;
@@ -436,6 +447,160 @@ body {
 .tag[data-category="class"] { background: rgba(138, 43, 226, 0.3); }
 .tag[data-category="diet"] { background: rgba(255, 140, 0, 0.3); }
 .tag[data-category="conservation"] { background: rgba(220, 20, 60, 0.3); }
+
+/* Colourful theme (optional, inspired by kids' animal videos) */
+body.theme-colourful {
+  background: #fff6e5;
+  color: #222;
+}
+
+.theme-colourful .gallery h1 {
+  font-weight: 900;
+  color: #e31e24;
+  letter-spacing: 0.01em;
+}
+
+.theme-colourful .back-link,
+.theme-colourful .settings-toggle {
+  color: #555;
+}
+
+.theme-colourful .settings,
+.theme-colourful .filters {
+  background: #fff;
+  border: 3px solid #00a8e0;
+}
+
+.theme-colourful .setting input[type="number"] {
+  background: #f1f1f1;
+  border-color: #ccc;
+  color: #222;
+}
+
+.theme-colourful .setting-sub {
+  color: #555;
+}
+
+.theme-colourful .filters-toggle {
+  color: #222;
+  font-weight: 700;
+}
+
+.theme-colourful .filter-option {
+  background: #f1f1f1;
+  border-color: #ddd;
+  color: #333;
+}
+
+.theme-colourful .filter-option.active {
+  color: #fff;
+}
+
+.theme-colourful .filter-option[data-category="biome"].active { background: #2fa84f; border-color: #2fa84f; }
+.theme-colourful .filter-option[data-category="geography"].active { background: #00a8e0; border-color: #00a8e0; }
+.theme-colourful .filter-option[data-category="class"].active { background: #8e2fa8; border-color: #8e2fa8; }
+.theme-colourful .filter-option[data-category="diet"].active { background: #ff7a00; border-color: #ff7a00; }
+.theme-colourful .filter-option[data-category="conservation"].active { background: #e31e24; border-color: #e31e24; }
+
+.theme-colourful .clear-filters,
+.theme-colourful .filters-active-count {
+  color: #666;
+}
+
+/* Stitched borders: white dashes that run around the frame like a conveyor belt.
+   The dashes are an SVG background so they can animate. Each pathLength is a
+   multiple of the dash pattern (3 + 2), so the loop has no visible seam.
+   Only the inner half of each stroke is visible, so stroke-width is double the line. */
+.theme-colourful {
+  --stitch-tile: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%25' height='100%25' rx='11' fill='none' stroke='white' stroke-width='4' pathLength='300' stroke-dasharray='3 2'><animate attributeName='stroke-dashoffset' from='0' to='-5' dur='0.5s' repeatCount='indefinite'/></rect></svg>");
+  --stitch-card: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%25' height='100%25' rx='12' fill='none' stroke='white' stroke-width='6' pathLength='600' stroke-dasharray='3 2'><animate attributeName='stroke-dashoffset' from='0' to='-5' dur='0.5s' repeatCount='indefinite'/></rect></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-colourful {
+    --stitch-tile: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%25' height='100%25' rx='11' fill='none' stroke='white' stroke-width='4' pathLength='300' stroke-dasharray='3 2'></rect></svg>");
+    --stitch-card: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%25' height='100%25' rx='12' fill='none' stroke='white' stroke-width='6' pathLength='600' stroke-dasharray='3 2'></rect></svg>");
+  }
+}
+
+/* Tiles: thick coloured border with a white stitched line */
+.theme-colourful .animal-tile {
+  background: var(--stitch-tile) center / calc(100% - 6px) calc(100% - 6px) no-repeat, var(--card-colour);
+  border: none;
+  border-radius: 14px;
+  padding: 8px;
+}
+
+.theme-colourful .animal-tile img {
+  border-radius: 8px;
+}
+
+.theme-colourful .animal-tile .name {
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 0.5rem 0.25rem 0.25rem;
+}
+
+/* Detail view: coloured background, stitched photo frame, name label */
+.theme-colourful .detail {
+  background: var(--card-colour);
+  transition: opacity 0.3s, visibility 0.3s, background 0.3s;
+}
+
+/* Photo frame: white edge, coloured band with the stitched line, then the photo */
+.theme-colourful .detail-content img {
+  padding: 22px;
+  border: 5px solid #fff;
+  border-radius: 22px;
+  background: var(--stitch-card) center / calc(100% - 18px) calc(100% - 18px) no-repeat, var(--card-colour);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.theme-colourful .detail-title {
+  align-self: center;
+  margin: 0.25rem 1rem 0.75rem;
+  padding: 0.3rem 1.5rem;
+  background: var(--card-colour);
+  border: 4px solid #fff;
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.theme-colourful .detail-info {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.theme-colourful .tag {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.theme-colourful .tag-label {
+  color: #777;
+}
+
+.theme-colourful .tag-value {
+  color: #222;
+  font-weight: 600;
+}
+
+.theme-colourful .counter {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.theme-colourful .nav-btn {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--card-colour);
+  font-weight: 900;
+}
+
+.theme-colourful .nav-btn:hover {
+  background: #fff;
+}
 
 @media (max-width: 600px) {
   .gallery {
