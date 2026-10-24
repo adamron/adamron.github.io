@@ -15,6 +15,7 @@
   // Open detail view
   AE.openDetail = function(index) {
     AE.state.currentIndex = index;
+    AE.markCardChange();
     AE.updateDetail();
     AE.els.detail.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -24,6 +25,7 @@
   AE.closeDetail = function() {
     AE.els.detail.classList.remove('active');
     document.body.style.overflow = '';
+    AE.stopSpeaking();
   };
 
   // Update detail view content
@@ -32,6 +34,7 @@
     AE.els.detailImg.src = animal.image;
     AE.els.detailImg.alt = animal.name;
     AE.els.detailTitle.textContent = animal.name;
+    AE.speakName(animal.name);
 
     // Counter shows position in filtered list
     var filteredPos = AE.state.filteredIndices.indexOf(AE.state.currentIndex) + 1;
@@ -67,6 +70,7 @@
   // Navigate to next/previous animal
   AE.navigate = function(direction) {
     if (AE.state.filteredIndices.length === 0) return;
+    if (AE.isNavLocked()) return;
 
     var currentFilteredPos = AE.state.filteredIndices.indexOf(AE.state.currentIndex);
     var newFilteredPos = currentFilteredPos + direction;
@@ -76,6 +80,7 @@
     if (newFilteredPos >= AE.state.filteredIndices.length) newFilteredPos = 0;
 
     AE.state.currentIndex = AE.state.filteredIndices[newFilteredPos];
+    AE.markCardChange();
     AE.updateDetail();
   };
 

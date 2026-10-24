@@ -4,6 +4,9 @@
     // Initialize DOM references
     AE.initElements();
 
+    // Load saved settings and wire up the settings panel
+    AE.initSettings();
+
     // Initialize detail view tag elements
     AE.initTagElements();
 

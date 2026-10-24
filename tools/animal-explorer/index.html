@@ -13,6 +13,22 @@
     <div class="gallery-header">
       <a href="../../index.html" class="back-link">&larr;</a>
       <h1>Animal Explorer</h1>
+      <button class="settings-toggle" id="settings-toggle" aria-label="Settings">&#9881;</button>
+    </div>
+    <div class="settings" id="settings">
+      <label class="setting">
+        <input type="checkbox" id="setting-speak">
+        <span>Say the animal's name</span>
+      </label>
+      <label class="setting">
+        <input type="checkbox" id="setting-lock">
+        <span>Slow down fast swiping</span>
+      </label>
+      <label class="setting setting-sub">
+        <span>Stay on each animal for at least</span>
+        <input type="number" id="setting-lock-seconds" min="0" max="10" step="0.1">
+        <span>seconds</span>
+      </label>
     </div>
     <div class="filters" id="filters">
       <button class="filters-toggle" id="filters-toggle">
@@ -42,6 +58,7 @@
 
   <script src="animals.js"></script>
   <script src="js/state.js"></script>
+  <script src="js/settings.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/gallery.js"></script>
   <script src="js/detail.js"></script>

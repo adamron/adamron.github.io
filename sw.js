@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tools-v14';
+const CACHE_NAME = 'tools-v15';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   '/tools/animal-explorer/index.html',
   '/tools/animal-explorer/css/styles.css',
   '/tools/animal-explorer/js/state.js',
+  '/tools/animal-explorer/js/settings.js',
   '/tools/animal-explorer/js/filters.js',
   '/tools/animal-explorer/js/gallery.js',
   '/tools/animal-explorer/js/detail.js',

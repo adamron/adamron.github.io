@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(python3:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(node fetch-animal.js:*)",
+      "Bash(du:*)",
+      "Bash(find:*)",
+      "Bash(curl:*)"
     ]
   }
 }

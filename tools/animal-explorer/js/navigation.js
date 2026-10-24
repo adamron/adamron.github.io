@@ -29,7 +29,7 @@
     var diff = dragCurrentX - dragStartX;
     var threshold = 80;
 
-    if (Math.abs(diff) > threshold) {
+    if (Math.abs(diff) > threshold && !AE.isNavLocked()) {
       // Animate out, then switch
       var direction = diff > 0 ? -1 : 1;
       var exitX = diff > 0 ? '100%' : '-100%';
